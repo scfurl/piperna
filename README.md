@@ -1,30 +1,30 @@
-[![PyPI](https://img.shields.io/pypi/v/simplesam.svg?)](https://pypi.org/project/henipipe/)
+[![PyPI](https://img.shields.io/pypi/v/simplesam.svg?)](https://pypi.org/project/piperna/)
 <!-- [![Build Status](https://travis-ci.org/mdshw5/simplesam.svg?branch=master)](https://travis-ci.org/mdshw5/simplesam) -->
-[![Documentation Status](https://readthedocs.org/projects/henipipe/badge/?version=latest)](https://henipipe.readthedocs.io/en/latest/?badge=latest)
+[![Documentation Status](https://readthedocs.org/projects/piperna/badge/?version=latest)](https://piperna.readthedocs.io/en/latest/?badge=latest)
 
-# henipipe
+# piperna
 ==========
 
-version 0.4
+version 0.01
 
-A python wrapper for processing of sequencing data generated using CutnRun or CutnTag (developed by the Henikoff lab FHCRC)
+A python wrapper for processing of bulk RNA seq data
 
 ## Requirements
 
-1. Python > 3.5 (henipipe uses the 'six' package but will attempt to install if not already installed)
+1. Python > 3.5 (piperna uses the 'six' package but will attempt to install if not already installed)
 2. Computing cluster with PBS or SLURM
-3. Modules installed for python, bowtie2, samtools, bedtools, R
+3. Modules installed for python, STAR or kallisto, R
 
 ## Installation
 
-Installation can probably be done correctly many different ways.  Here are the methods that have worked for us.  We recommend that henipipe be installed with pipx.
+Installation can probably be done correctly many different ways.  Here are the methods that have worked for us.  We recommend that piperna be installed with pipx.
 
 **At SCRI do the following**
 ```bash
 module load python
 python3 -m pip install --user pipx
 python3 -m pipx ensurepath
-pipx install --include-deps --pip-args '--trusted-host pypi.org --trusted-host files.pythonhosted.org' henipipe
+pipx install --include-deps --pip-args '--trusted-host pypi.org --trusted-host files.pythonhosted.org' piperna
 ```
 
 
@@ -33,13 +33,13 @@ pipx install --include-deps --pip-args '--trusted-host pypi.org --trusted-host f
 module load Python/3.6.7-foss-2016b-fh1
 python3 -m pip install --user pipx
 python3 -m pipx ensurepath
-pipx install --include-deps henipipe
+pipx install --include-deps piperna
 ```
 
-You should then be able to test installation by calling henipipe.  After running the folllowing, you should see the help screen displayed.
+You should then be able to test installation by calling piperna.  After running the folllowing, you should see the help screen displayed.
 
 ```bash
-henipipe
+piperna
 ```
 
 
@@ -47,7 +47,7 @@ henipipe
 ## Usage
 
 ```bash
-henipipe usage: A wrapper for running henipipe [-h] [--sample_flag SAMPLE_FLAG]
+piperna usage: A wrapper for running piperna [-h] [--sample_flag SAMPLE_FLAG]
                                       [--fastq_folder FASTQ_FOLDER]
                                       [--genome_key GENOME_KEY]
                                       [--filter_high FILTER_HIGH]
@@ -98,8 +98,8 @@ optional arguments:
                         tab-delim file with sample fields as defined in the
                         script. - REQUIRED for all jobs except MAKERUNSHEET
   --log_prefix LOG_PREFIX, -l LOG_PREFIX
-                        Prefix specifying log files for henipipe output from
-                        henipipe calls. OPTIONAL
+                        Prefix specifying log files for piperna output from
+                        piperna calls. OPTIONAL
   --select SELECT, -s SELECT
                         To only run the selected row in the runsheet, OPTIONAL
   --debug, -d           To print commands (For testing flow). OPTIONAL
@@ -111,7 +111,7 @@ optional arguments:
   --norm_method {coverage,read_count,spike_in}, -n {coverage,read_count,spike_in}
                         For ALIGN and NORM: Normalization method, by
                         "read_count", "coverage", or "spike_in". If method is
-                        "spike_in", HeniPipe will align to the spike_in
+                        "spike_in", piperna will align to the spike_in
                         reference genome provided in runsheet. OPTIONAL
   --user USER, -u USER  user for submitting jobs - defaults to username.
                         OPTIONAL
@@ -129,7 +129,7 @@ optional arguments:
 
 ## Runsheet
 
-The runsheet is the brains of the henipipe workflow.  You can make a runsheet using the MAKERUNSHEET command.  This command will parse a directory of fastq folder (specified using the -fq flag; fastq files should be organized in subfolders named by sample) and will find fastq mates (R1 and R2 - Currently only PE sequencing is supported).  Running henipipe MAKERUNSHEET will find and pair these fastqs for you and populate the runsheet with genome index locations (see below) and output filenames with locations as specified using the -o flag.  Note that thenipie output will default to the current working directory if no location is otherwise specified.  There is an option for selecting only folders that contain a specific string (using the -sf flag).  *After generation of a runsheet (csv file), you should take a look at it in Excel or Numbers to make sure things look okay...*  Here are the columns that you can include.  Order is irrelevant.  Column names (headers) exactly as written below are required.
+The runsheet is the brains of the piperna workflow.  You can make a runsheet using the MAKERUNSHEET command.  This command will parse a directory of fastq folder (specified using the -fq flag; fastq files should be organized in subfolders named by sample) and will find fastq mates (R1 and R2 - Currently only PE sequencing is supported).  Running piperna MAKERUNSHEET will find and pair these fastqs for you and populate the runsheet with genome index locations (see below) and output filenames with locations as specified using the -o flag.  Note that thenipie output will default to the current working directory if no location is otherwise specified.  There is an option for selecting only folders that contain a specific string (using the -sf flag).  *After generation of a runsheet (csv file), you should take a look at it in Excel or Numbers to make sure things look okay...*  Here are the columns that you can include.  Order is irrelevant.  Column names (headers) exactly as written below are required.
 
 ### Example Runsheet 
 
@@ -155,9 +155,9 @@ The runsheet is the brains of the henipipe workflow.  You can make a runsheet us
 
 ## Genomes and adding genome locations
 
-Henipipe uses Bowtie2 for alignment.  As such, you should have a previously indexed location of your genome accessible to henipipe.  This location is referred to in henipipe as the 'fasta'.  Similarly, one should provide the location of the spike_in indexed reference genome in the 'spikein_fasta' field.  For bedgraph conversion, a text file of genome sizes text file is also needed.  See the following for a discussion on how to make a 'genome_sizes' file https://www.biostars.org/p/173963/.
+piperna uses Bowtie2 for alignment.  As such, you should have a previously indexed location of your genome accessible to piperna.  This location is referred to in piperna as the 'fasta'.  Similarly, one should provide the location of the spike_in indexed reference genome in the 'spikein_fasta' field.  For bedgraph conversion, a text file of genome sizes text file is also needed.  See the following for a discussion on how to make a 'genome_sizes' file https://www.biostars.org/p/173963/.
 
-Henipipe provides an easy way to add these locations to your system for repeated use using the --genome_key (-gk) option during MAKERUNSHEET commands.  A file called genomes.json can be found in the 'data' directory of the henipipe install folder.  This file can be edited to include those locations you want to regularly put in the runsheet.  The following shows an example of a genomes.json file.  The files "top level" is a name that can be used in the --genome_key field (-gk) during runsheet generation to populate the columns of the runsheet with fasta, spikein_fasta, and genome_sizes locations associated with that genome_key.  The 'default' key will be used when no genome_key is specified.
+piperna provides an easy way to add these locations to your system for repeated use using the --genome_key (-gk) option during MAKERUNSHEET commands.  A file called genomes.json can be found in the 'data' directory of the piperna install folder.  This file can be edited to include those locations you want to regularly put in the runsheet.  The following shows an example of a genomes.json file.  The files "top level" is a name that can be used in the --genome_key field (-gk) during runsheet generation to populate the columns of the runsheet with fasta, spikein_fasta, and genome_sizes locations associated with that genome_key.  The 'default' key will be used when no genome_key is specified.
 
 ```json
 {
@@ -172,7 +172,7 @@ Henipipe provides an easy way to add these locations to your system for repeated
     }
 ```
 
-## Doing a henipipe run
+## Doing a piperna run
 
 Say your fastqs live within within subfolders of a folder 'fastq' in the folder 'data'.  So if you were to...
 ```bash
@@ -182,24 +182,24 @@ ls
 ... you'd get a bunch of folders, each of which would be filled with fastqs.  Each folder name should correspond to a sample name.
 
 
-**To run henipipe, do the following...**
-1. Make a new output directory 'henipipe'.
-2. Go into that directory and make a runsheet pointing to the fastq folder i.e. the folder level above.  (at the command line, henipipe is cool with either relative or absolute pathnames; but as stated earlier, absolute pathnames are required for the runsheet.)
+**To run piperna, do the following...**
+1. Make a new output directory 'piperna'.
+2. Go into that directory and make a runsheet pointing to the fastq folder i.e. the folder level above.  (at the command line, piperna is cool with either relative or absolute pathnames; but as stated earlier, absolute pathnames are required for the runsheet.)
 3.  Optionally you can only select directories of fastq files that contain in their name the string denoted using the -sf flag.
 4. After inspecting and completing the runsheet, run ALIGN, NORM, and SEACR.  
 5. Sit back have a cocktail.
 
 ```bash
 cd ..
-mkdir henipipe
-cd henipipe
-henipipe MAKERUNSHEET -fq ../fastq -sf MySampleDirectoriesStartWithThisString -o .
-henipipe ALIGN -r runsheet.csv
-henipipe NORM -r runsheet.csv
-henipipe SEACR -r runsheet.csv
+mkdir piperna
+cd piperna
+piperna MAKERUNSHEET -fq ../fastq -sf MySampleDirectoriesStartWithThisString -o .
+piperna ALIGN -r runsheet.csv
+piperna NORM -r runsheet.csv
+piperna SEACR -r runsheet.csv
 ```
 
 
 ## Acknowledgements
 
-Written by Scott Furlan with code inspiration from Andrew Hill's cellwrapper; Henipipe includes a python script samTobed.py which takes code from a fantastic sam reader "simplesam" - https://github.com/mdshw5/simplesam.  samTobed.py uses specific sam-sorting parameters as written in Jorja Henikoff's PERL script.
+Written by Scott Furlan with code inspiration from Andrew Hill's cellwrapper; piperna includes a python script samTobed.py which takes code from a fantastic sam reader "simplesam" - https://github.com/mdshw5/simplesam.  samTobed.py uses specific sam-sorting parameters as written in Jorja Henikoff's PERL script.
