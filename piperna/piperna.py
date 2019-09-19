@@ -183,6 +183,7 @@ class summarize(SampleFactory, object):
         self.command = self.summarize_executable()
         self.script = self.generate_job()
         self.processor_line = "select=1:mem=100gb:ncpus=4"
+        self.runsheet_data = [{"sample":"all_samples"}]
     def __call__():
         pass
 
