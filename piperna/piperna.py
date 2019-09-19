@@ -286,7 +286,7 @@ def load_genomes(genomes_file):
         genome_data = json.load(read_file)
     return genome_data
 
-def make_runsheet(folder, sample_flag, genome_key, output=None, fasta=None, software="STAR"):
+def make_runsheet(folder, sample_flag, genome_key, typeofseq, output=None, fasta=None, software="STAR"):
     #folder = '/active/furlan_s/Data/CNR/190801_CNRNotch/fastq/mini/fastq'
     genome_data = load_genomes(GENOMES_JSON).get(genome_key)
     if output is None:
