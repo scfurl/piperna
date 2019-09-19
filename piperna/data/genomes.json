@@ -6,7 +6,7 @@
         "fasta": "/home/sfurla/software/cellranger/refdata-cellranger-3.0.0/GRCm38_KpOxCy/star"
     },
     "notch_bulk": {
-        "fasta": "/home/sfurla/refs/GRCh38/TG/star_indices_overhang100/",
+        "fasta": "/home/sfurla/refs/GRCh38/TG/star_indices_overhang100/"
     },
     "mmul8": {
         "fasta": "/active/furlan_s/refs/Mmul8v2/star"
