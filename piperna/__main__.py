@@ -71,7 +71,7 @@ def run_piperna(args=None):
 
     if args.job=="MAKERUNSHEET":
         LOGGER.info("Parsing fastq folder - "+args.fastq_folder+" ...")
-        piperna.make_runsheet(folder=args.fastq_folder, output=args.output, typeofseq=args.typeofseq, genome_key=args.geneme_key, sample_flag = args.sample_flag, software=args.software)
+        piperna.make_runsheet(folder=args.fastq_folder, output=args.output, typeofseq=args.typeofseq, genome_key=args.genome_key, sample_flag = args.sample_flag, software=args.software)
         exit()
 
     #parse and chech runsheet
