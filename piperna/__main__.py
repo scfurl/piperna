@@ -83,7 +83,7 @@ def run_piperna(args=None):
 
     #parse and chech runsheet
     args.runsheet = os.path.abspath(args.runsheet)
-    parsed_runsheet = list(parse_runsheet(args.runsheet))
+    parsed_runsheet = list(piperna.parse_runsheet(args.runsheet))
     piperna.check_runsheet(args, parsed_runsheet, verbose=args.verbose)
 
 
