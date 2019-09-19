@@ -22,11 +22,13 @@ gtffile <- df$gtf[1]
 if(is.null(gtffile)){stop("GTF file not found: NULL input")}
 if(!file.exists(gtffile)){stop(paste0("GTF file not found: ", gtffile))}
 message(paste0("Loading gtf file: ", gtffile))
+message(paste0("Summarizing data by: ", opts$b))
+message(paste0("Adding an additonal annotation column (gene_short_name): ", opts$geneshort))
 # txdb <- makeTxDbFromGFF(gtffile, format="gtf")
 # ebg <- exonsBy(txdb, by="gene")
 gff0 <- import(gtffile)
 idx <- mcols(gff0)$type == "exon"
-genes<- split(gff0[idx], mcols(gff)[[opts$by]])
+genes<- split(gff0[idx], mcols(gff0[idx])[[opts$by]])
 if("fastq1" %in% colnames(df)){
     if("fastq2" %in% colnames(df)){
         singleend=FALSE
@@ -37,6 +39,7 @@ if("fastqs" %in% colnames(df)){
 }
 if(df$software[1]=="STAR"){
 	filenames <- file.path(paste0(df$output, "Aligned.sortedByCoord.out.bam"))
+	df$filenames <- filenames
 	if(!all(file.exists(filenames))){stop("All Bam files not found")}
 	message("All Bam files in runsheet found")
 	bamfiles <- BamFileList(filenames, yieldSize=20000000)
@@ -50,6 +53,8 @@ if(df$software[1]=="STAR"){
 	mcols(se)[[opts$by]]=mcols(gff0)[[opts$by]][match(rownames(se), mcols(gff0)[[opts$by]])]
 	#all(mcols(se)[[opts$by]]==rownames(se))
 	mcols(se)[['gene_short']]<-mcols(gff0)[[opts$geneshort]][match(rownames(se), mcols(gff0)[[opts$by]])]
+	colnames(se)<-df$filenames
+	colData(se)<-DataFrame(df)
 	saveRDS(se, opts$o)
 
 }
