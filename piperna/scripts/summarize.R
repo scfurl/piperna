@@ -16,6 +16,10 @@ opts <- docopt(doc)
 require("GenomicAlignments")
 require("Rsamtools")
 require("rtracklayer")
+require("BiocParallel")
+
+register(MulticoreParam(workers=16))
+registered()
 
 df <- read.csv(opts$r, stringsAsFactors=F)
 gtffile <- df$gtf[1]
@@ -55,6 +59,7 @@ if(df$software[1]=="STAR"){
 	mcols(se)[['gene_short']]<-mcols(gff0)[[opts$geneshort]][match(rownames(se), mcols(gff0)[[opts$by]])]
 	colnames(se)<-df$filenames
 	colData(se)<-DataFrame(df)
+	#saveRDS(se, "SE_32cores.RDS")
 	saveRDS(se, opts$o)
 
 }

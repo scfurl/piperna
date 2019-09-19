@@ -14,7 +14,7 @@ A python wrapper for processing of bulk RNA seq data
 1. Python > 3.5 (piperna uses the 'six' package but will attempt to install if not already installed)
 2. Computing cluster with PBS or SLURM
 3. Modules installed for python, STAR or kallisto, 
-4. R Modules for GenomicAlignments GenomicFeatures and Rsamtools if running SUMMARIZE
+4. R Modules for GenomicAlignments, rtracklayer, and Rsamtools if running SUMMARIZE
 
 ## Installation
 
@@ -186,6 +186,15 @@ cd piperna
 piperna MAKERUNSHEET -fq ../fastq -sf MySampleDirectoriesStartWithThisString -o .
 piperna ALIGN -r runsheet.csv
 piperna SUMMARIZE -r runsheet.csv -o SummarizedExperiment.RDS
+```
+
+
+## Interfacing with DESeq2
+
+**After running piperna, the SummarizedExperiment.RDS file can be input directly into DESeq2 like this**
+
+```R
+
 ```
 
 
