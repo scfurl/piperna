@@ -305,7 +305,6 @@ def make_runsheet(folder, sample_flag, genome_key, typeofseq, output=None, fasta
             'index': genome_data.get('fasta')})
     #print(good_dat)
     keys = ["sample", "output", "software", "index"]
-    LOGGER.info("Writing runsheet to - "+os.path.join(output, 'runsheet.csv')+" ...")
     with open(os.path.join(output, 'runsheet.csv'), 'w') as output_file:
         dict_writer = csv.DictWriter(output_file, fieldnames = keys, extrasaction='ignore')
         dict_writer.writeheader()
