@@ -37,6 +37,7 @@ import json
 _ROOT = os.path.abspath(os.path.dirname(__file__))
 #GENOMES_JSON = os.path.join('/Users/sfurla/Box Sync/PI_FurlanS/computation/develop/piperna/piperna/data/genomes.json')
 GENOMES_JSON = os.path.join(_ROOT, 'data', 'genomes.json')
+SUMMARIZE_SCRIPT = os.path.join(_ROOT, 'scripts', 'summarize.R')
 
 class SampleFactory:
     def __init__(self, *args, **kwargs):
@@ -149,7 +150,7 @@ class Star(SampleFactory, object):
 
 class kallisto(SampleFactory, object):
     def __init__(self, *args, **kwargs):
-        super(Star, self).__init__(*args, **kwargs)
+        super(kallisto, self).__init__(*args, **kwargs)
         self.runmode = self.get_runmode()
         self.mfl = kwargs.get('mfl')
         self.sfl = kwargs.get('sfl')
@@ -174,7 +175,27 @@ class kallisto(SampleFactory, object):
             command.append(commandline)
         return command
 
+class summarize(SampleFactory, object):
+    def __init__(self, *args, **kwargs):
+        super(summarize, self).__init__(*args, **kwargs)
+        self.runsheet = kwargs.get('runsheet')
+        self.output = kwargs.get('output')
+        self.command = self.summarize_executable()
+        self.script = self.generate_job()
+        self.processor_line = "select=1:mem=100gb:ncpus=4"
+    def __call__():
+        pass
 
+    def summarize_executable(self):
+        commandline=""
+        command = []
+        for sample in self.runsheet_data:
+            modules = """\nmodule load R\n"""
+            commandline = """\n%s -r %s -o %s""" % (SUMMARIZE_SCRIPT, self.runsheet, self.output)
+            commandline = modules + commandline
+            #print(commandline.__class__.__name__)
+            command.append(commandline)
+        return command
 
 def convert_windows_newlines(file_name):
     """

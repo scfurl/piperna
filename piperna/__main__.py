@@ -27,7 +27,7 @@ def run_piperna(args=None):
     parser.add_argument('--runsheet', '-r', type=str, help='tab-delim file with sample fields as defined in the script. - REQUIRED for all jobs except MAKERUNSHEET')
     parser.add_argument('--typeofseq', '-t', type=str, default = "pe", choices=['single', 'pe'], help= 'Type of sequencing performed - REQUIRED for MAKERUNSHEET')
     parser.add_argument('--software', '-s', type=str, choices=['STAR', 'kallisto'], default="STAR", help='To set desired software, required and used for MAKERUNSHEET only')
-    parser.add_argument('--output', '-o', type=str, default=".", help='To set output path, required for MAKERUNSHEET')
+    parser.add_argument('--output', '-o', type=str, default=".", help='To set output path, required for MAKERUNSHEET; OPTIONAL for SUMMARIZE-- default for SUMMARIZE is ./SummarizedExperiment.RDS')
     parser.add_argument('--debug', '-d', action='store_true', help='To print commands (For testing flow)')
     parser.add_argument('--cluster', '-c', type=str, default='PBS', choices=['PBS', 'SLURM'], help='Cluster software.  OPTIONAL Currently supported: PBS and SLURM')
     parser.add_argument('--user', '-u', type=str, default='sfurla', help='user for submitting jobs - defaults to username.  OPTIONAL')
@@ -104,7 +104,11 @@ def run_piperna(args=None):
             kallisto.run_Job()
 
     if args.job == "SUMMARIZE":
-        summarize = piperna.summarize(runsheet_data = list(parsed_runsheet), user=args.user, \
-                debug=args.debug, threads=args.threads, log=args.log_prefix, \
-                count=args.count, out_sam_type=args.outSAMtype, \
-                global_add_STAR_string=args.addSTARstring, cluster=args.cluster)
+        if os.path.isabs(args.output) is False:
+            if args.output == ".":
+                args.output = os.getcwd()
+            else :
+                args.output = os.path.abspath(args.output)
+        summarize = piperna.summarize(runsheet = args.runsheet, user=args.user, \
+                debug=args.debug, threads=args.threads, log=args.log_prefix, cluster=args.cluster, output = args.output)
+        summarize.run_job()
