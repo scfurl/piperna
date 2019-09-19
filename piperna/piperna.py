@@ -72,7 +72,7 @@ class SampleFactory:
                 #to_append = '#!/bin/bash\n#PBS -N %s\n#PBS -l %s\n#PBS -j oe\n#PBS -o $PBS_O_WORKDIR/%s\n#PBS -A %s\ncd $PBS_O_WORKDIR\n%s' % (job_name, self.processor_line, self.log_name, self.user, command)
                 #to_append = '#!/bin/bash\n#PBS -N %s\n#PBS -l %s\n#PBS -j oe\n#PBS -o $PBS_O_WORKDIR/%s\n#PBS -A %s\ncd $PBS_O_WORKDIR\n%s' % (job_name, self.processor_line, log_file, self.user, command)
                 #to_append = "#!/bin/bash\n#PBS -N %s\n#PBS -l  %s\n#PBS -j oe\n#PBS -o $PBS_JOBDIR/%s\n#PBS -A %s\ncd $PBS_O_WORKDIR\n%s\nsed -e 's/^/[HENIPIPE] %s: /' $PBS_JOBDIR/%s >> %s\n" % (job_name, self.processor_line, log_file, self.user, command, job_name, log_file, self.log_name)
-                to_append = "#!/bin/bash\n#PBS -N %s\n#PBS -l %s\n#PBS -j oe\n#PBS -o $PBS_O_WORKDIR/logtmp\n#PBS -A %s\ncd $PBS_O_WORKDIR\n{%s} 2>&1 | tee %s\nsed -e 's/^/[RNASEQALIGN] JOB: %s:\t\t/' %s >> %s\nrm %s\n" % (job_name, self.processor_line, self.user, command, log_file, job_name, log_file, self.log_name, log_file)
+                to_append = "#!/bin/bash\n#PBS -N %s\n#PBS -l %s\n#PBS -j oe\n#PBS -o $PBS_O_WORKDIR/logtmp\n#PBS -A %s\ncd $PBS_O_WORKDIR\n{%s} 2>&1 | tee %s\nsed -e 's/^/[piperna] JOB: %s:\t\t/' %s >> %s\nrm %s\n" % (job_name, self.processor_line, self.user, command, log_file, job_name, log_file, self.log_name, log_file)
             if self.cluster=="SLURM":
                 to_append = '#!/bin/bash\n#SBATCH --job-name=%s\n#SBATCH --ntasks=1\n#SBATCH --cpus-per-task=1\n#SBATCH --mem-per-cpu=8000\n%s' % (job_name, command)
             job_string.append(to_append)
@@ -303,36 +303,14 @@ def make_runsheet(folder, sample_flag, genome_key, typeofseq, output=None, fasta
         i.update({'sample': i.get('directory_short'), \
             'output': os.path.join(output, i.get('directory_short')), \
             'software': software,
-            'index': genome_data.get('fasta')})
+            'index': genome_data.get('fasta'),
+            'gtf': genome_data.get('gtf')})
     #print(good_dat)
     keys = good_dat[0].keys()
     with open(os.path.join(output, 'runsheet.csv'), 'w') as output_file:
         dict_writer = csv.DictWriter(output_file, fieldnames = keys, extrasaction='ignore')
         dict_writer.writeheader()
         dict_writer.writerows(good_dat)
-
-# def make_hp_runsheet(folder, sample_flag, genome_key, output="./henipipeout", fasta=None, spikein_fasta=None, genome_sizes=None):
-#     genome_data = load_genomes(GENOMES_JSON).get(genome_key)
-#     ddir=[x[0] for x in os.walk(folder)]
-#     dat=list(map(find_fastq_mate, ddir))
-#     good_dat = [i for i in dat if i.get('has_fastq') is True]
-#     good_dat = [i for i in good_dat if re.compile(r'.*'+sample_flag).search(i.get('directory_short'))]
-#     for i in good_dat:
-#         i.update({'sample': i.get('directory_short'), \
-#             'bed_out': os.path.join(output, i.get('directory_short')+".bed"), \
-#             'spikein_bed_out': os.path.join(output, i.get('directory_short')+"_spikein.bed"), \
-#             'bedgraph': os.path.join(output, i.get('directory_short')+".bedgraph"), \
-#             'SEACR_key': i.get('directory_short'), \
-#             'MERGE_key': i.get('directory_short'), \
-#             'SEACR_out': os.path.join(output, i.get('directory_short')+"_SEACR"), \
-#             'fasta': genome_data.get('fasta'), 'spikein_fasta': genome_data.get('spikein_fasta'), 'genome_sizes':  genome_data.get('genome_sizes')})
-#     #print(good_dat)
-#     #keys = good_dat[0].keys()
-#     keys = ["sample", "SEACR_key", "MERGE_key", "fasta", "spikein_fasta", "genome_sizes", "fastq1", "fastq2", "bed_out", "spikein_bed_out", "bedgraph", "SEACR_out"]
-#     with open(os.path.join(output, 'runsheet.csv'), 'w') as output_file:
-#         dict_writer = csv.DictWriter(output_file, fieldnames = keys, extrasaction='ignore')
-#         dict_writer.writeheader()
-#         dict_writer.writerows(good_dat)
 
 def check_runsheet_parameter(runsheet, parameter, verbose=False):
     for i in runsheet:

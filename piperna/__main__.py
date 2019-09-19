@@ -6,7 +6,7 @@ import os
 from . import piperna
 
 POLL_TIME = 5
-LOG_PREFIX = '[RNASEQALIGN]: '
+LOG_PREFIX = '[piperna]: '
 
 # Set up a basic logger
 LOGGER = logging.getLogger('something')
@@ -15,14 +15,14 @@ handler = logging.StreamHandler()
 handler.setFormatter(myFormatter)
 LOGGER.addHandler(handler)
 LOGGER.setLevel(logging.DEBUG)
-myFormatter._fmt = "[RNASEQALIGN]: " + myFormatter._fmt
+myFormatter._fmt = "[piperna]: " + myFormatter._fmt
 
 
 def run_piperna(args=None):
     parser = argparse.ArgumentParser('A wrapper for running RNASeq Alignment')
-    parser.add_argument('job', type=str, choices=['MAKERUNSHEET', 'ALIGN'], help='a required string denoting segment of pipeline to run.  1) "MAKERUNSHEET" - to parse a folder of fastqs; 2) "ALIGN" - to perform alignment')
+    parser.add_argument('job', type=str, choices=['MAKERUNSHEET', 'ALIGN', 'SUMMARIZE'], help='a required string denoting segment of pipeline to run.  1) "MAKERUNSHEET" - to parse a folder of fastqs; 2) "ALIGN" - to perform alignment; 3) "SUMMARIZE" - to summarize and count reads')
     parser.add_argument('--fastq_folder', '-fq', type=str, help='For MAKERUNSHEET only: Pathname of fastq folder (files must be organized in folders named by sample)')
-    parser.add_argument('--genome_key', '-gk', type=str, help='For MAKERUNSHEET only: abbreviation to use "installed" genomes in the runsheet (See README.md for more details')
+    parser.add_argument('--genome_key', '-gk', default="default", type=str, help='For MAKERUNSHEET only: abbreviation to use "installed" genomes in the runsheet (See README.md for more details')
     parser.add_argument('--sample_flag', '-f', type=str, default="", help='FOR MAKERUNSHEET only string to identify samples of interest in a fastq folder')
     parser.add_argument('--runsheet', '-r', type=str, help='tab-delim file with sample fields as defined in the script. - REQUIRED for all jobs except MAKERUNSHEET')
     parser.add_argument('--typeofseq', '-t', type=str, default = "pe", choices=['single', 'pe'], help= 'Type of sequencing performed - REQUIRED for MAKERUNSHEET')
@@ -37,7 +37,7 @@ def run_piperna(args=None):
     parser.add_argument('--count', '-co', action='store_true', default=True, help='Run Count (STAR Only)')
     parser.add_argument('--outSAMtype', '-st', type=str, default='BAM SortedByCoordinate', help='To define type of SAM/BAM output (STAR Only)')
     parser.add_argument('--addSTARstring', '-a', type=str, default='', help='Additional STAR arguments to be run on all jobs in runsheet (STAR Only)')
-    parser.add_argument('--log_prefix', '-l', type=str, default='log', help='Prefix specifying log files for henipipe output from henipipe calls. OPTIONAL')
+    parser.add_argument('--log_prefix', '-l', type=str, default='piperna.log', help='Prefix specifying log files for henipipe output from henipipe calls. OPTIONAL')
     parser.add_argument('--verbose', '-v', default=False, action='store_true', help='Run with some additional ouput - not much though... OPTIONAL')
 
     args = parser.parse_args()
@@ -102,3 +102,9 @@ def run_piperna(args=None):
                 debug=args.debug, threads=args.threads, log=args.log_prefix, \
                 mfl = args.mfl, sfl = args.sfl, cluster=args.cluster)
             kallisto.run_Job()
+
+    if args.job == "SUMMARIZE":
+        summarize = piperna.summarize(runsheet_data = list(parsed_runsheet), user=args.user, \
+                debug=args.debug, threads=args.threads, log=args.log_prefix, \
+                count=args.count, out_sam_type=args.outSAMtype, \
+                global_add_STAR_string=args.addSTARstring, cluster=args.cluster)

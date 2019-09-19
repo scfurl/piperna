@@ -135,10 +135,10 @@ The runsheet is the brains of the piperna workflow.  You can make a runsheet usi
 
 **absolute pathnames are required for runsheets**
 
-| sample | index | fastq1 | fastq2 | output |  software  |
-|--------|-------|--------|--------|--------|------------|
-|  mys1  |  path |  path  |  path  |  path  |   STAR     |
-|  mys2  |  path |  path  |  path  |  path  |   STAR     |
+| sample | index | fastq1 | fastq2 | output |  software  |     gtf    |
+|--------|-------|--------|--------|--------|------------|------------|
+|  mys1  |  path |  path  |  path  |  path  |   STAR     |    path    |
+|  mys2  |  path |  path  |  path  |  path  |   STAR     |    path    |
 
 
 * 'sample' name of the sample REQUIRED.  
@@ -147,7 +147,8 @@ The runsheet is the brains of the piperna workflow.  You can make a runsheet usi
 * 'fastq2' a tab seperated string of filenames denoting location of all R2 files for a sample REQUIRED if paired end.  
 * 'fastqs' a tab seperated string of filenames can be used for single end reads REQUIRED if single end.  
 * 'output' name of the location for the aligned and sorted bam file.  
-* 'software' either 'STAR' or 'kallisto'.  
+* 'software' either 'STAR' or 'kallisto'.  REQUIRED
+* 'gtf' a location for annotation file in gtf format.  REQUIRED for SUMMARIZE.  
 
 ## Genomes and adding genome locations
 
@@ -158,10 +159,14 @@ piperna provides an easy way to add these locations to your system for repeated 
 ```json
 {
     "default": {
-        "index": "/path/path/hg38/STAR_index",
+      "index": "/path/path/hg38/STAR_index",
+      "gtf": "/path/path/hg38/hg38.gtf"
+    },
     "default_kallisto": {
         "index": "/path/path/hg38/kallisto_index",
+        "gtf": "/path/path/hg38/hg38.gtf"
     }
+}
 ```
 
 ## Doing a piperna run
