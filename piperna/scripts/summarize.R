@@ -36,12 +36,14 @@ if("fastqs" %in% colnames(df)){
 if(df$software[1]=="STAR"){
 	filenames <- file.path(paste0(df$output, "Aligned.sortedByCoord.out.bam"))
 	if(!all(file.exists(filenames))){stop("All Bam files not found")}
+	message("All Bam files in runsheet found")
 	bamfiles <- BamFileList(filenames, yieldSize=20000000)
-
+	message("Summarizing Overlap")
 	se <- summarizeOverlaps(features=ebg,
 	                        reads=bamfiles,
 	                        mode="Union",
 	                        singleEnd=singleend,
 	                        ignore.strand=TRUE)
+	message(paste0("Saving data as: ", opts$o))
 	saveRDS(se, opts$o)
 }
