@@ -182,9 +182,10 @@ class summarize(SampleFactory, object):
         self.output = kwargs.get('output')
         self.runsheet_data = [{"sample":"all_samples"}]
         self.job = "SUMMARIZE"
+        self.processor_line = "select=1:mem=100gb:ncpus=4"
         self.command = self.summarize_executable()
         self.script = self.generate_job()
-        self.processor_line = "select=1:mem=100gb:ncpus=4"
+
 
     def __call__():
         pass
