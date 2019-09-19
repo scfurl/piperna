@@ -90,6 +90,7 @@ class SampleFactory:
                     proc = Popen('qsub', shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, close_fds=True)
                     if (sys.version_info > (3, 0)):
                         proc.stdin.write(script.encode('utf-8'))
+                        out, err = proc.communicate()
                     else:
                         proc.stdin.write(script)
                         out, err = proc.communicate()
