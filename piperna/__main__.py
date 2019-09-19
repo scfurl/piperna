@@ -39,7 +39,14 @@ def run_piperna(args=None):
     parser.add_argument('--addSTARstring', '-a', type=str, default='', help='Additional STAR arguments to be run on all jobs in runsheet (STAR Only)')
     parser.add_argument('--log_prefix', '-l', type=str, default='log', help='Prefix specifying log files for henipipe output from henipipe calls. OPTIONAL')
     parser.add_argument('--verbose', '-v', default=False, action='store_true', help='Run with some additional ouput - not much though... OPTIONAL')
+
     args = parser.parse_args()
+    #call = 'henipipe MAKERUNSHEET -fq ../fastq -sf mini -gk heni_hg38 -o .'
+    #call = 'henipipe GENOMESFILE'
+
+    #
+    #call='piperna MAKERUNSHEET -o . -gk shivani_bulk -fq "/active/furlan_s/Data/RORCAR_bulk/190917_SN367_1432_AH3KYLBCX3/Unaligned/Project_ssrivas2"'
+    #args = parser.parse_args(call.split(" ")[1:])
 
     #log
     if args.debug == False:
