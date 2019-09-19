@@ -8,20 +8,25 @@ Usage:
 Options:
    -r --runsheet Runsheet location [default: ./runsheet.csv].
    -o --output Runsheet location [default: ./summarizedExperiment.RDS].
+   -b --by Summarize by gene_id, gene_name, exons, transcripts.  This string should be found in gtf file [default: gene_id].
+   -s --geneshort An alternative name for the "by" argument.  This string should be found in gtf file [default: gene_name].
 ' -> doc
 
 opts <- docopt(doc)
 require("GenomicAlignments")
-require("GenomicFeatures")
 require("Rsamtools")
+require("rtracklayer")
 
 df <- read.csv(opts$r, stringsAsFactors=F)
 gtffile <- df$gtf[1]
 if(is.null(gtffile)){stop("GTF file not found: NULL input")}
 if(!file.exists(gtffile)){stop(paste0("GTF file not found: ", gtffile))}
 message(paste0("Loading gtf file: ", gtffile))
-txdb <- makeTxDbFromGFF(gtffile, format="gtf")
-ebg <- exonsBy(txdb, by="gene")
+# txdb <- makeTxDbFromGFF(gtffile, format="gtf")
+# ebg <- exonsBy(txdb, by="gene")
+gff0 <- import(gtffile)
+idx <- mcols(gff0)$type == "exon"
+genes<- split(gff0[idx], mcols(gff)[[opts$by]])
 if("fastq1" %in% colnames(df)){
     if("fastq2" %in% colnames(df)){
         singleend=FALSE
@@ -36,11 +41,15 @@ if(df$software[1]=="STAR"){
 	message("All Bam files in runsheet found")
 	bamfiles <- BamFileList(filenames, yieldSize=20000000)
 	message("Summarizing Overlap")
-	se <- summarizeOverlaps(features=ebg,
+	se <- summarizeOverlaps(features=genes,
 	                        reads=bamfiles,
 	                        mode="Union",
 	                        singleEnd=singleend,
 	                        ignore.strand=TRUE)
 	message(paste0("Saving data as: ", opts$o))
+	mcols(se)[[opts$by]]=mcols(gff0)[[opts$by]][match(rownames(se), mcols(gff0)[[opts$by]])]
+	#all(mcols(se)[[opts$by]]==rownames(se))
+	mcols(se)[['gene_short']]<-mcols(gff0)[[opts$geneshort]][match(rownames(se), mcols(gff0)[[opts$by]])]
 	saveRDS(se, opts$o)
+
 }
