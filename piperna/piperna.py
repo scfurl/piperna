@@ -194,7 +194,7 @@ class summarize(SampleFactory, object):
         commandline=""
         command = []
         modules = """\nmodule load R\n"""
-        commandline = """\nRscript %s -r %s -o %s""" % (SUMMARIZE_SCRIPT, self.runsheet, self.output)
+        commandline = """echo '\n[SUMMARIZE] Running SUMMARIZE... Output:\n'\nRscript %s -r %s -o %s\n""" % (SUMMARIZE_SCRIPT, self.runsheet, self.output)
         commandline = modules + commandline
         #print(commandline.__class__.__name__)
         command.append(commandline)
