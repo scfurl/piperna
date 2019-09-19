@@ -35,6 +35,7 @@ from itertools import chain, compress
 import json
 
 _ROOT = os.path.abspath(os.path.dirname(__file__))
+#GENOMES_JSON = os.path.join('/Users/sfurla/Box Sync/PI_FurlanS/computation/develop/piperna/piperna/data/genomes.json')
 GENOMES_JSON = os.path.join(_ROOT, 'data', 'genomes.json')
 
 class SampleFactory:
@@ -288,6 +289,7 @@ def load_genomes(genomes_file):
 
 def make_runsheet(folder, sample_flag, genome_key, typeofseq, output=None, fasta=None, software="STAR"):
     #folder = '/active/furlan_s/Data/CNR/190801_CNRNotch/fastq/mini/fastq'
+    #genome_key = "shivani_bulk"
     genome_data = load_genomes(GENOMES_JSON).get(genome_key)
     if output is None:
         output = os.path.join(os.getcwd())
