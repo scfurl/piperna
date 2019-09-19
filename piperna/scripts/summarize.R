@@ -1,16 +1,16 @@
 #!/usr/bin/env Rscript
 require(docopt)
-'Usage:
-   summarize.R [-r runsheet -o <output>]
+'Summarize.
+
+Usage:
+   summarize.R [options]
 
 Options:
-   -r Runsheet [default: ./runsheet.csv]
-   -o Output file [default: ./SummarizedExperiment.RDS]
-
- ]' -> doc
+   -r --runsheet Runsheet location [default: ./runsheet.csv].
+   -o --output Runsheet location [default: ./summarizedExperiment.RDS].
+' -> doc
 
 opts <- docopt(doc)
-
 require("GenomicAlignments")
 require("BiocParallel")
 require("GenomicFeatures")
@@ -18,17 +18,19 @@ require("Rsamtools")
 
 register(MulticoreParam(4))
 
-df <- read.csv(opts$r)
+df <- read.csv(opts$r, stringsAsFactors=F)
 gtffile <- df$gtf[1]
+if(is.null(gtffile)){stop("GTF file not found: NULL input")}
+if(!file.exists(gtffile)){stop(paste0("GTF file not found: ", gtffile))}
 message(paste0("Loading gtf file: ", gtffile))
 txdb <- makeTxDbFromGFF(gtffile, format="gtf")
 ebg <- exonsBy(txdb, by="gene")
-if("fastq1" %in% colnames(dtf)){
-    if("fastq2" %in% colnames(dtf)){
+if("fastq1" %in% colnames(df)){
+    if("fastq2" %in% colnames(df)){
         singleend=FALSE
     }
 }
-if("fastqs" %in% colnames(dtf)){
+if("fastqs" %in% colnames(df)){
 	singleend=TRUE
 }
 if(df$software[1]=="STAR"){
