@@ -22,7 +22,7 @@ def run_piperna(args=None):
     parser = argparse.ArgumentParser('A wrapper for running RNASeq Alignment')
     parser.add_argument('job', type=str, choices=['MAKERUNSHEET', 'ALIGN'], help='a required string denoting segment of pipeline to run.  1) "MAKERUNSHEET" - to parse a folder of fastqs; 2) "ALIGN" - to perform alignment')
     parser.add_argument('--fastq_folder', '-fq', type=str, help='For MAKERUNSHEET only: Pathname of fastq folder (files must be organized in folders named by sample)')
-    parser.add_argument('--fasta_flag', '-fa', type=str, help='For MAKERUNSHEET only: Pathname of fastq folder containing indexed genomes')
+    parser.add_argument('--genome_key', '-gk', type=str, help='For MAKERUNSHEET only: abbreviation to use "installed" genomes in the runsheet (See README.md for more details')
     parser.add_argument('--sample_flag', '-f', type=str, default="", help='FOR MAKERUNSHEET only string to identify samples of interest in a fastq folder')
     parser.add_argument('--runsheet', '-r', type=str, help='tab-delim file with sample fields as defined in the script. - REQUIRED for all jobs except MAKERUNSHEET')
     parser.add_argument('--typeofseq', '-t', type=str, default = "pe", choices=['single', 'pe'], help= 'Type of sequencing performed - REQUIRED for MAKERUNSHEET')
@@ -71,7 +71,7 @@ def run_piperna(args=None):
 
     if args.job=="MAKERUNSHEET":
         LOGGER.info("Parsing fastq folder - "+args.fastq_folder+" ...")
-        piperna.make_runsheet(folder=args.fastq_folder, output=args.output, typeofseq=args.typeofseq, fasta_flag=args.fasta_flag, sample_flag = args.sample_flag, software=args.software)
+        piperna.make_runsheet(folder=args.fastq_folder, output=args.output, typeofseq=args.typeofseq, genome_key=args.geneme_key, sample_flag = args.sample_flag, software=args.software)
         exit()
 
     #parse and chech runsheet
