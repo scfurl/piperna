@@ -18,7 +18,7 @@ require("Rsamtools")
 require("rtracklayer")
 require("BiocParallel")
 
-register(MulticoreParam(workers=16))
+register(MulticoreParam(workers=8))
 registered()
 
 df <- read.csv(opts$r, stringsAsFactors=F)
