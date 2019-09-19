@@ -348,7 +348,7 @@ def check_runsheet(args, runsheet, verbose=False):
     required_args = ["sample", "output", "software", "index"]
     has_data = []
     for i in required_args:
-        has_data.append(check_runsheet_parameter(parsed_runsheet, i, verbose = verbose))
+        has_data.append(check_runsheet_parameter(runsheet, i, verbose = verbose))
     has_data = dict(zip(required_args, has_data))
     listOfKeys = getKeysByValues(has_data, [0])
     error_string = "Data not found for the following required runsheet columns: "
