@@ -135,40 +135,32 @@ The runsheet is the brains of the piperna workflow.  You can make a runsheet usi
 
 **absolute pathnames are required for runsheets**
 
-| sample | fasta | spikein_fasta | fastq1 | fastq2 | bed_out | spikein_bed_out | genome_sizes | bedgraph |  SEACR_key  | SEACR_out |
-|--------|-------|---------------|--------|--------|---------|-----------------|--------------|----------|-------------|-----------|
-|  mys1  |  path |      path     |  path  |  path  |   path  |       path      |     path     |   path   |     4JS     |   path    |
-|  mys2  |  path |      path     |  path  |  path  |   path  |       path      |     path     |   path   | 4JS_CONTROL |   path    |
+| sample | index | fastq1 | fastq2 | output |  software  |
+|--------|-------|--------|--------|--------|------------|
+|  mys1  |  path |  path  |  path  |  path  |   STAR     |
+|  mys2  |  path |  path  |  path  |  path  |   STAR     |
 
 
 * 'sample' name of the sample REQUIRED.  
-* 'fasta' location of the Bowtie2 indexed fasta file REQUIRED.  
-* 'spikein_fasta' location of the Bowtie2 indexed fasta file for spike_in normalization OPTIONAL.  
-* 'fastq1' a tab seperated string of filenames denoting location of all R1 files for a sample REQUIRED.  
-* 'fastq2' a tab seperated string of filenames denoting location of all R2 files for a sample REQUIRED.  
-* 'bed_out' name of the location for the aligned and sorted bam file REQUIRED.  
-* 'spikein_bed_out' name of the location for the aligned and sorted bam file OPTIONAL.  
-* 'genome_sizes' REQUIRED.  
-* 'bedgraph' file name of normalized bedgraph REQUIRED.  
-* 'SEACR_key' sample key corresponding to sample groups to be run against an IgG (or other) contol.  all samples to be run against a control are given the same name and the control is labeleled with the an additional string underscore + 'CONTROL' (i.e. 4JS_CONTROL) OPTIONAL.  
-* 'SEACR_out' file name of SEACR output OPTIONAL.  
+* 'index' location of the indexed fasta file REQUIRED.  
+* 'fastq1' a tab seperated string of filenames denoting location of all R1 files for a sample REQUIRED if paired end.  
+* 'fastq2' a tab seperated string of filenames denoting location of all R2 files for a sample REQUIRED if paired end.  
+* 'fastqs' a tab seperated string of filenames can be used for single end reads REQUIRED if single end.  
+* 'output' name of the location for the aligned and sorted bam file.  
+* 'software' either 'STAR' or 'kallisto'.  
 
 ## Genomes and adding genome locations
 
-piperna uses Bowtie2 for alignment.  As such, you should have a previously indexed location of your genome accessible to piperna.  This location is referred to in piperna as the 'fasta'.  Similarly, one should provide the location of the spike_in indexed reference genome in the 'spikein_fasta' field.  For bedgraph conversion, a text file of genome sizes text file is also needed.  See the following for a discussion on how to make a 'genome_sizes' file https://www.biostars.org/p/173963/.
+you should have a previously indexed (by the software package of your choosing) location of your genome accessible to piperna.  This location is referred to in piperna as the 'index'.
 
-piperna provides an easy way to add these locations to your system for repeated use using the --genome_key (-gk) option during MAKERUNSHEET commands.  A file called genomes.json can be found in the 'data' directory of the piperna install folder.  This file can be edited to include those locations you want to regularly put in the runsheet.  The following shows an example of a genomes.json file.  The files "top level" is a name that can be used in the --genome_key field (-gk) during runsheet generation to populate the columns of the runsheet with fasta, spikein_fasta, and genome_sizes locations associated with that genome_key.  The 'default' key will be used when no genome_key is specified.
+piperna provides an easy way to add these locations to your system for repeated use using the --genome_key (-gk) option during MAKERUNSHEET commands.  A file called genomes.json can be found in the 'data' directory of the piperna install folder.  This file can be edited to include those locations you want to regularly put in the runsheet.  The following shows an example of a genomes.json file.  The files "top level" is a name that can be used in the --genome_key field (-gk) during runsheet generation to populate the columns of the runsheet with locations associated with that genome_key.  The 'default' key will be used when no genome_key is specified.
 
 ```json
 {
     "default": {
-        "fasta": "/path/path/hg38/bowtie2_index",
-        "genome_sizes": "/path/path/hg38/genome_sizes.txt",
-        "spikein_fasta": "/path/path/Ecoli/bowtie2_index"},
-    "my_hg38": {
-        "fasta": "/shared/biodata/ngs/Reference/iGenomes/Homo_sapiens/UCSC/hg38/Sequence/Bowtie2Index/genome",
-        "genome_sizes": "/shared/ngs/illumina/henikoff/solexa/databases/human/hg38/chr_lens.txt",
-        "spikein_fasta": "/shared/ngs/illumina/henikoff/Bowtie2/Ecoli"
+        "index": "/path/path/hg38/STAR_index",
+    "default_kallisto": {
+        "index": "/path/path/hg38/kallisto_index",
     }
 ```
 
@@ -195,11 +187,9 @@ mkdir piperna
 cd piperna
 piperna MAKERUNSHEET -fq ../fastq -sf MySampleDirectoriesStartWithThisString -o .
 piperna ALIGN -r runsheet.csv
-piperna NORM -r runsheet.csv
-piperna SEACR -r runsheet.csv
 ```
 
 
 ## Acknowledgements
 
-Written by Scott Furlan with code inspiration from Andrew Hill's cellwrapper; piperna includes a python script samTobed.py which takes code from a fantastic sam reader "simplesam" - https://github.com/mdshw5/simplesam.  samTobed.py uses specific sam-sorting parameters as written in Jorja Henikoff's PERL script.
+Written by Scott Furlan with code inspiration from Andrew Hill's cellwrapper.
