@@ -189,12 +189,11 @@ class summarize(SampleFactory, object):
     def summarize_executable(self):
         commandline=""
         command = []
-        for sample in self.runsheet_data:
-            modules = """\nmodule load R\n"""
-            commandline = """\n%s -r %s -o %s""" % (SUMMARIZE_SCRIPT, self.runsheet, self.output)
-            commandline = modules + commandline
-            #print(commandline.__class__.__name__)
-            command.append(commandline)
+        modules = """\nmodule load R\n"""
+        commandline = """\n%s -r %s -o %s""" % (SUMMARIZE_SCRIPT, self.runsheet, self.output)
+        commandline = modules + commandline
+        #print(commandline.__class__.__name__)
+        command.append(commandline)
         return command
 
 def convert_windows_newlines(file_name):
