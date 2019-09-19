@@ -91,14 +91,14 @@ def run_piperna(args=None):
     parsed_runsheet = piperna.parse_runsheet(args.runsheet)
     if args.job == "ALIGN":
         if args.software == "STAR":
-            piperna.Star = Star(runsheet_data = list(parsed_runsheet), user=args.user, \
+            Star = piperna.Star(runsheet_data = list(parsed_runsheet), user=args.user, \
                 debug=args.debug, threads=args.threads, log=args.log_prefix, \
                 count=args.count, out_sam_type=args.outSAMtype, \
                 global_add_STAR_string=args.addSTARstring, cluster=args.cluster)
             Star.run_job()
 
         if args.software == "kallisto":
-            piperna.kallisto = kallisto(runsheet_data = list(parsed_runsheet), user=args.user, \
+            kallisto = piperna.kallisto(runsheet_data = list(parsed_runsheet), user=args.user, \
                 debug=args.debug, threads=args.threads, log=args.log_prefix, \
                 mfl = args.mfl, sfl = args.sfl, cluster=args.cluster)
             kallisto.run_Job()
