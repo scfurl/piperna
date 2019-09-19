@@ -20,7 +20,7 @@ register(MulticoreParam(4))
 
 df <- read.csv(opts$r)
 gtffile <- df$gtf[1]
-message(paste0("Loading gtf file: ", gtffile)
+message(paste0("Loading gtf file: ", gtffile))
 txdb <- makeTxDbFromGFF(gtffile, format="gtf")
 ebg <- exonsBy(txdb, by="gene")
 if("fastq1" %in% colnames(dtf)){
