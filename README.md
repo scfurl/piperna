@@ -13,7 +13,8 @@ A python wrapper for processing of bulk RNA seq data
 
 1. Python > 3.5 (piperna uses the 'six' package but will attempt to install if not already installed)
 2. Computing cluster with PBS or SLURM
-3. Modules installed for python, STAR or kallisto, R
+3. Modules installed for python, STAR or kallisto, 
+4. R Modules for GenomicAlignments GenomicFeatures and Rsamtools if running SUMMARIZE
 
 ## Installation
 

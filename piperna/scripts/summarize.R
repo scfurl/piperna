@@ -12,11 +12,8 @@ Options:
 
 opts <- docopt(doc)
 require("GenomicAlignments")
-require("BiocParallel")
 require("GenomicFeatures")
 require("Rsamtools")
-
-register(MulticoreParam(4))
 
 df <- read.csv(opts$r, stringsAsFactors=F)
 gtffile <- df$gtf[1]
