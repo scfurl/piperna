@@ -204,6 +204,7 @@ class concatfastq(SampleFactory, object):
     def __init__(self, *args, **kwargs):
         super(concatfastq, self).__init__(*args, **kwargs)
         self.flowcell_folders = kwargs.get('folders')
+        self.job="CONCATFASTQ"
         self.output = kwargs.get('output')
         self.typeofseq = kwargs.get('typeofseq')
         self.runsheet_data = self.prep_concatfastq()
