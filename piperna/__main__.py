@@ -73,7 +73,7 @@ def run_piperna(args=None):
                 args.output = os.path.abspath(args.output)
         if os.path.exists(args.output) is False:
             raise ValueError('Path: '+args.output+' not found')
-    if args.job != "MAKERUNSHEET":
+    if args.job != "MAKERUNSHEET" and args.job != "CONCATFASTQ":
         if os.path.exists(args.runsheet) is False:
             raise ValueError('Path: '+args.runsheet+' not found')
 
