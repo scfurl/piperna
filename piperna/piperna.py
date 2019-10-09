@@ -86,11 +86,13 @@ class SampleFactory:
 
 
     def run_job(self):
+        popen_commands = {"PBS":'qsub', "SLURM":['sbatch']}
+        popen_command = popen_commands.get(self.cluster)
         for script in self.script:
             if self.cluster=="PBS":
                 if self.debug==False:
                     # Open a pipe to the command.
-                    proc = Popen('qsub', shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, close_fds=True)
+                    proc = Popen(popen_command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, close_fds=True)
                     if (sys.version_info > (3, 0)):
                         proc.stdin.write(script.encode('utf-8'))
                         out, err = proc.communicate()
@@ -98,15 +100,6 @@ class SampleFactory:
                         proc.stdin.write(script)
                         out, err = proc.communicate()
                 # Print your job and the system response to the screen as it's submitted
-                print(script)
-                if self.debug==False:
-                    print(out)
-                    time.sleep(0.1)
-            if self.cluster=="SLURM":
-                if self.debug==False:
-                    #open("temp.sh", 'w').write(script+'\n')
-                    proc = Popen(['sbatch'], stdin=PIPE, stdout=PIPE, stderr=PIPE)
-                    out, err = proc.communicate(script)
                 print(script)
                 if self.debug==False:
                     print(out)
@@ -215,6 +208,7 @@ class concatfastq(SampleFactory, object):
         self.runsheet_data = self.prep_concatfastq()
         self.command = self.concatfastq_executable()
         self.script = self.generate_job()
+
     def __call__():
         pass
 
