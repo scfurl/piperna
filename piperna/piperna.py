@@ -200,6 +200,66 @@ class summarize(SampleFactory, object):
         command.append(commandline)
         return command
 
+class concatfastq(SampleFactory, object):
+    def __init__(self, *args, **kwargs):
+        super(concatfastq, self).__init__(*args, **kwargs)
+        self.flowcell_folders = kwargs.get('folders')
+        self.output = kwargs.get('output')
+        self.typeofseq = kwargs.get('typeofseq')
+        self.runsheet_data = prep_concatfastq()
+        self.command = self.concatfastq_executable()
+        self.script = self.generate_job()
+    def __call__():
+        pass
+
+    def prep_concatfastq(self):
+        flowcell_folders = self.flow_cell_folders.split(",")
+        #flowcell_folders = args.flow_cell_folders.split(",")
+        if self.output is None:
+            output = os.path.join(os.getcwd())
+        files_by_handle={}
+        typeofseq=self.typeofseq
+        output = self.output
+        #typeofseq="pe"
+        for fc in flowcell_folders:
+            #ddir=[x[0] for x in os.walk(fc)]
+            fastq1s=[os.path.basename(i) for i in find_fastq_mate(fc).get("fastq1").split("\t")]
+            handles = unique_handle(fastq1s)
+            for i in handles:
+                merged_fn = os.path.join(output, i+"_R1.fastq.gz")
+                r = re.compile("^"+i+"*")
+                filelist = [os.path.join(fc, j) for j in sorted(list(filter(r.match, fastq1s)))]
+                if not all([os.path.exists(i) for i in filelist]):
+                    raise ValueError("One of these files was not found: "+", ".join(filelist))
+                if merged_fn in files_by_handle:
+                    files_by_handle.get(merged_fn).extend(filelist)
+                else:
+                    files_by_handle.update({merged_fn: filelist})
+            if typeofseq =="pe": 
+                fastq2s=[os.path.basename(i) for i in find_fastq_mate(fc).get("fastq2").split("\t")]
+                handles = unique_handle(fastq2s)
+                for i in handles:
+                    merged_fn = os.path.join(output, i+"_R2.fastq.gz")
+                    r = re.compile("^"+i+"*")
+                    filelist = [os.path.join(fc, j) for j in sorted(list(filter(r.match, fastq2s)))]
+                    if not all([os.path.exists(i) for i in filelist]):
+                        raise ValueError("One of these files was not found: "+", ".join(filelist))
+                    if merged_fn in files_by_handle:
+                        files_by_handle.get(merged_fn).extend(filelist)
+                    else:
+                        files_by_handle.update({merged_fn: filelist})
+
+    def concatfastq_executable(self):
+        commandline=""
+        command = []
+        for key in self.runsheet_data:
+            files_to_concat = " ".join(self.runsheet_data.get(key))
+            commandline = """\ncat {0} > {1}""".format(key, )
+            #print(commandline.__class__.__name__)
+            command.append(commandline)
+        return command
+
+
 def convert_windows_newlines(file_name):
     """
     Helper function for converting windows newlines in a file as a preprocessing step in case users make samplesheet
@@ -220,6 +280,12 @@ def convert_windows_newlines(file_name):
     with open(file_name, 'w') as output:
         output.write(file_text)
 
+def unique_handle(fastqlist):
+    #this function takes a list of fastq files and finds the "unique handle" ignoring lane and file number and groups and orders the fastqs based on this handle
+    #the goal of this function is to find the set of files that ultimately can concatenated to create one sample (i.e. one unique handle)
+    regpat="_L..._R._....fastq.gz"
+    handles = sorted(list(set([os.path.basename(i) for i in [re.sub(regpat, "", i) for i in fastqlist]])))
+    return handles
 
 def find_colnames(runsheet, header=True):
     """

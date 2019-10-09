@@ -20,12 +20,12 @@ myFormatter._fmt = "[piperna]: " + myFormatter._fmt
 
 def run_piperna(args=None):
     parser = argparse.ArgumentParser('A wrapper for running RNASeq Alignment')
-    parser.add_argument('job', type=str, choices=['MAKERUNSHEET', 'ALIGN', 'SUMMARIZE'], help='a required string denoting segment of pipeline to run.  1) "MAKERUNSHEET" - to parse a folder of fastqs; 2) "ALIGN" - to perform alignment; 3) "SUMMARIZE" - to summarize and count reads')
-    parser.add_argument('--fastq_folder', '-fq', type=str, help='For MAKERUNSHEET only: Pathname of fastq folder (files must be organized in folders named by sample)')
+    parser.add_argument('job', type=str, choices=['MAKERUNSHEET', 'ALIGN', 'SUMMARIZE', 'CONCATFASTQ'], help='a required string denoting segment of pipeline to run.  1) "MAKERUNSHEET" - to parse a folder of fastqs; 2) "ALIGN" - to perform alignment; 3) "SUMMARIZE" - to summarize and count reads, 4) "CONCATFASTQ" - function to concatenate fastq files -i.e. for SRA upload')
+    parser.add_argument('--fastq_folder', '-fq', type=str, help='For MAKERUNSHEET only: Pathname of fastq folder (files should be organized in folders named by sample)')
     parser.add_argument('--genome_key', '-gk', default="default", type=str, help='For MAKERUNSHEET only: abbreviation to use "installed" genomes in the runsheet (See README.md for more details')
     parser.add_argument('--sample_flag', '-f', type=str, default="", help='FOR MAKERUNSHEET only string to identify samples of interest in a fastq folder')
     parser.add_argument('--runsheet', '-r', type=str, help='tab-delim file with sample fields as defined in the script. - REQUIRED for all jobs except MAKERUNSHEET')
-    parser.add_argument('--typeofseq', '-t', type=str, default = "pe", choices=['single', 'pe'], help= 'Type of sequencing performed - REQUIRED for MAKERUNSHEET')
+    parser.add_argument('--typeofseq', '-t', type=str, default = "pe", choices=['single', 'pe'], help= 'Type of sequencing performed - REQUIRED for MAKERUNSHEET and CONCATFASTQ')
     parser.add_argument('--software', '-s', type=str, choices=['STAR', 'kallisto'], default="STAR", help='To set desired software, required and used for MAKERUNSHEET only')
     parser.add_argument('--output', '-o', type=str, default=".", help='To set output path, required for MAKERUNSHEET; OPTIONAL for SUMMARIZE-- default for SUMMARIZE is ./SummarizedExperiment.RDS')
     parser.add_argument('--debug', '-d', action='store_true', help='To print commands (For testing flow)')
@@ -38,17 +38,18 @@ def run_piperna(args=None):
     parser.add_argument('--outSAMtype', '-st', type=str, default='BAM SortedByCoordinate', help='To define type of SAM/BAM output (STAR Only)')
     parser.add_argument('--addSTARstring', '-a', type=str, default='', help='Additional STAR arguments to be run on all jobs in runsheet (STAR Only)')
     parser.add_argument('--log_prefix', '-l', type=str, default='piperna.log', help='Prefix specifying log files for henipipe output from henipipe calls. OPTIONAL')
+    parser.add_argument('--flow_cell_folders', '-fc', type=str, default="", help='For CONCATFASTQ only: Comma-seprated location of flowcell folders - i.e. as output from CellRanger REQUIRED for CONCATFASTQ')
     parser.add_argument('--verbose', '-v', default=False, action='store_true', help='Run with some additional ouput - not much though... OPTIONAL')
 
     args = parser.parse_args()
-    #call = 'henipipe MAKERUNSHEET -fq ../fastq -sf mini -gk heni_hg38 -o .'
-    #call = 'henipipe GENOMESFILE'
-
-    #
-    #call='piperna MAKERUNSHEET -o . -gk shivani_bulk -fq "/active/furlan_s/Data/RORCAR_bulk/190917_SN367_1432_AH3KYLBCX3/Unaligned/Project_ssrivas2"'
-    #args = parser.parse_args(call.split(" ")[1:])
+    """
+    call='piperna CONCATFASTQ -fc /archive/furlan_s/seq/cellranger/181015-NHPTreg/HHJJ7BGX5/outs/fastq_path,/archive/furlan_s/seq/cellranger/181015-NHPTreg/HWVFMBGX3/outs/fastq_path'
+    call='piperna MAKERUNSHEET -o . -gk shivani_bulk -fq "/active/furlan_s/Data/RORCAR_bulk/190917_SN367_1432_AH3KYLBCX3/Unaligned/Project_ssrivas2"'
+    args = parser.parse_args(call.split(" ")[1:])
 
     #log
+    """
+
     if args.debug == False:
         LOGGER.info("Logging to %s... examine this file if samples fail." % args.log_prefix)
 
@@ -79,6 +80,12 @@ def run_piperna(args=None):
     if args.job=="MAKERUNSHEET":
         LOGGER.info("Parsing fastq folder - "+args.fastq_folder+" ...")
         piperna.make_runsheet(folder=args.fastq_folder, output=args.output, typeofseq=args.typeofseq, genome_key=args.genome_key, sample_flag = args.sample_flag, software=args.software)
+        exit()
+
+    if args.job=="CONCATFASTQ":
+        LOGGER.info("Concatenating fastqs in the folder(s) - "+" and ".join(args.flow_cell_folders.split(","))+" ...")
+        concatfastqjob = piperna.concatfastq(folder=args.flow_cell_folders, output=args.output, typeofseq=args.typeofseq)
+        concatfastqjob.run_Job()
         exit()
 
     #parse and chech runsheet

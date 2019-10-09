@@ -28,20 +28,12 @@ with open("README.md", "r") as fh:
 
 
 """
-#TEST PyPI
-## run this to make package: python3 setup.py sdist bdist_wheel
-## run this to upload to test pypi: twine upload --repository-url https://test.pypi.org/legacy/ dist/*
-#TEST INSTALL
-# pip install --index-url https://test.pypi.org/piperna/ piperna
+cd ~/Box\ Sync/PI_FurlanS/computation/develop/piperna/
+rm dist/*
+python3 setup.py sdist bdist_wheel
+python3 -m twine upload dist/*
 
 
-#FOR REAL
-## run this to make package: python3 setup.py sdist bdist_wheel
-## run this to upload to pypi: python3 -m twine upload dist/*
-
-##Install pipx
-## python3 -m pip install --user pipx
-## python3 -m pipx ensurepath
 
 **At SCRI do the following**
 
@@ -49,7 +41,7 @@ module load python
 python3 -m pip install --user pipx
 python3 -m pipx ensurepath
 pipx install --include-deps --pip-args '--trusted-host pypi.org --trusted-host files.pythonhosted.org' piperna
-pipx install --spec git+https://github.com/scfurl/piperna --include-deps piperna --pip-args '--trusted-host pypi.org --trusted-host files.pythonhosted.org'
+pipx install --spec git+https://github.com/scfurl/piperna@dev --include-deps piperna --pip-args '--trusted-host pypi.org --trusted-host files.pythonhosted.org'
 
 
 **At the FHCRC do the following...**
