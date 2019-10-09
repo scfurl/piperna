@@ -85,6 +85,7 @@ def run_piperna(args=None):
 
     if args.job=="CONCATFASTQ":
         args.flow_cell_folders = os.path.abspath(args.flow_cell_folders)
+        args.output = os.path.abspath(args.output)
         LOGGER.info("Concatenating fastqs in the folder(s) - "+" and ".join(args.flow_cell_folders.split(","))+" ...")
         concatfastqjob = piperna.concatfastq(folders=args.flow_cell_folders, output=args.output, typeofseq=args.typeofseq, cluster=args.cluster, threads = 1)
         concatfastqjob.run_job()
@@ -94,10 +95,10 @@ def run_piperna(args=None):
     args.runsheet = os.path.abspath(args.runsheet)
     parsed_runsheet = list(piperna.parse_runsheet(args.runsheet))
     piperna.check_runsheet(args, parsed_runsheet, verbose=args.verbose)
-
-
     args.runsheet = os.path.abspath(args.runsheet)
     parsed_runsheet = piperna.parse_runsheet(args.runsheet)
+
+
     if args.job == "ALIGN":
         if args.software == "STAR":
             Star = piperna.Star(runsheet_data = list(parsed_runsheet), user=args.user, \
