@@ -252,7 +252,7 @@ class concatfastq(SampleFactory, object):
         runsheet_data=[]
         for key, value in files_by_handle.items():
             runsheet_data.append({  "sample":key,
-                                    "file_list":values})
+                                    "file_list":value})
         return runsheet_data
 
     def concatfastq_executable(self):
