@@ -249,7 +249,11 @@ class concatfastq(SampleFactory, object):
                         files_by_handle.get(merged_fn).extend(filelist)
                     else:
                         files_by_handle.update({merged_fn: filelist})
-        return files_by_handle
+        runsheet_data=[]
+        for key, value in files_by_handle.iteritems():
+            runsheet_data.append({  "sample":key,
+                                    "file_list":values})
+        return runsheet_data
 
     def concatfastq_executable(self):
         commandline=""
