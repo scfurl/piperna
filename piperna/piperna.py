@@ -257,7 +257,7 @@ class concatfastq(SampleFactory, object):
         runsheet_data=[]
         i=1
         for key, value in files_by_handle.items():
-            runsheet_data.append({  "sample" : i,
+            runsheet_data.append({  "sample" : str(i),
                                     "key" : key,
                                     "file_list" : value})
             i = i+1
