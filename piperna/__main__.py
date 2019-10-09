@@ -87,7 +87,7 @@ def run_piperna(args=None):
         args.flow_cell_folders = os.path.abspath(args.flow_cell_folders)
         args.output = os.path.abspath(args.output)
         LOGGER.info("Concatenating fastqs in the folder(s) - "+" and ".join(args.flow_cell_folders.split(","))+" ...")
-        concatfastqjob = piperna.concatfastq(folders=args.flow_cell_folders, output=args.output, typeofseq=args.typeofseq, cluster=args.cluster, threads = 1, log=args.log_prefix)
+        concatfastqjob = piperna.concatfastq(folders=args.flow_cell_folders, output=args.output, typeofseq=args.typeofseq, cluster=args.cluster, threads = 1, log=args.log_prefix, user=args.user, debug=args.debug)
         concatfastqjob.run_job()
         exit()
 
