@@ -255,7 +255,7 @@ class concatfastq(SampleFactory, object):
         command = []
         for key in self.runsheet_data:
             files_to_concat = " ".join(self.runsheet_data.get(key))
-            commandline = """\ncat {0} > {1}""".format(key, )
+            commandline = """\ncat {0} > {1}""".format(key, files_to_concat)
             #print(commandline.__class__.__name__)
             command.append(commandline)
         return command
