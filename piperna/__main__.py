@@ -73,6 +73,7 @@ def run_piperna(args=None):
                 args.output = os.path.abspath(args.output)
         if os.path.exists(args.output) is False:
             raise ValueError('Path: '+args.output+' not found')
+
     if args.job != "MAKERUNSHEET" and args.job != "CONCATFASTQ":
         if os.path.exists(args.runsheet) is False:
             raise ValueError('Path: '+args.runsheet+' not found')
@@ -83,6 +84,7 @@ def run_piperna(args=None):
         exit()
 
     if args.job=="CONCATFASTQ":
+        args.flow_cell_folders = os.path.abspath(args.flow_cell_folders)
         LOGGER.info("Concatenating fastqs in the folder(s) - "+" and ".join(args.flow_cell_folders.split(","))+" ...")
         concatfastqjob = piperna.concatfastq(folders=args.flow_cell_folders, output=args.output, typeofseq=args.typeofseq, cluster=args.cluster, threads = 1)
         concatfastqjob.run_job()

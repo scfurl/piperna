@@ -53,5 +53,5 @@ pipx install --include-deps piperna
 pipx install --spec git+https://github.com/scfurl/piperna --include-deps piperna 
 
 
-piperna CONCATFASTQ -fc /archive/furlan_s/seq/cellranger/181015-NHPTreg/HHJJ7BGX5/outs/fastq_path,/archive/furlan_s/seq/cellranger/181015-NHPTreg/HWVFMBGX3/outs/fastq_path -d
+piperna CONCATFASTQ -fc /archive/furlan_s/seq/cellranger/181015-NHPTreg/HHJJ7BGX5/outs/fastq_path,/archive/furlan_s/seq/cellranger/181015-NHPTreg/HWVFMBGX3/outs/fastq_path -o . -d
 """
