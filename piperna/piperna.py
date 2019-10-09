@@ -213,7 +213,7 @@ class concatfastq(SampleFactory, object):
         pass
 
     def prep_concatfastq(self):
-        flowcell_folders = self.flow_cell_folders.split(",")
+        flowcell_folders = self.flowcell_folders.split(",")
         #flowcell_folders = args.flow_cell_folders.split(",")
         if self.output is None:
             output = os.path.join(os.getcwd())
