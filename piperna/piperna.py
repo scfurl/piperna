@@ -70,18 +70,20 @@ class SampleFactory:
             job_name = self.job + "_" + self.runsheet_data[i]['sample']
             command = self.command[i]
             if self.cluster=="PBS":
-                #to_append = '#!/bin/bash\n#PBS -N %s\n#PBS -l %s\n#PBS -j oe\n#PBS -o $PBS_O_WORKDIR/%s\n#PBS -A %s\ncd $PBS_O_WORKDIR\n%s' % (job_name, self.processor_line, self.log_name, self.user, command)
-                #to_append = '#!/bin/bash\n#PBS -N %s\n#PBS -l %s\n#PBS -j oe\n#PBS -o $PBS_O_WORKDIR/%s\n#PBS -A %s\ncd $PBS_O_WORKDIR\n%s' % (job_name, self.processor_line, log_file, self.user, command)
-                #to_append = "#!/bin/bash\n#PBS -N %s\n#PBS -l  %s\n#PBS -j oe\n#PBS -o $PBS_JOBDIR/%s\n#PBS -A %s\ncd $PBS_O_WORKDIR\n%s\nsed -e 's/^/[HENIPIPE] %s: /' $PBS_JOBDIR/%s >> %s\n" % (job_name, self.processor_line, log_file, self.user, command, job_name, log_file, self.log_name)
                 to_append = "#!/bin/bash\n#PBS -N %s\n#PBS -l %s\n#PBS -j oe\n#PBS -o $PBS_O_WORKDIR/logtmp\n#PBS -A %s\ncd $PBS_O_WORKDIR\n{%s} 2>&1 | tee %s\nsed -e 's/^/[piperna] JOB: %s:\t\t/' %s >> %s\nrm %s\n" % (job_name, self.processor_line, self.user, command, log_file, job_name, log_file, self.log_name, log_file)
             if self.cluster=="SLURM":
-                to_append = '#!/bin/bash\n#SBATCH --job-name=%s\n#SBATCH --ntasks=1\n#SBATCH --cpus-per-task=1\n#SBATCH --mem-per-cpu=8000\n%s' % (job_name, command)
+                to_append = '#!/bin/bash\n#SBATCH --job-name=%s\n#SBATCH --ntasks=1\n\n%s' % (job_name, self.processor_line, command)
             job_string.append(to_append)
         return job_string
 
     def get_processor_line(self):
-        gb = self.threads * 8
-        return """select=1:mem=%sGB:ncpus=%s""" % (gb, self.threads)
+        if self.cluster=="PBS":
+            gb = self.threads * 8
+            return """select=1:mem=%sGB:ncpus=%s""" % (gb, self.threads)
+        if self.cluster=="SLURM":
+            gb = self.threads * 8000
+            return """SBATCH --cpus-per-task=%s\n#SBATCH --mem-per-cpu=%s"""% (self.threads, gb)
+
 
     def run_job(self):
         for script in self.script:
@@ -182,7 +184,8 @@ class summarize(SampleFactory, object):
         self.output = kwargs.get('output')
         self.runsheet_data = [{"sample":"all_samples"}]
         self.job = "SUMMARIZE"
-        self.processor_line = "select=1:mem=100gb:ncpus=16"
+        self.threads = kwargs.get('threads')
+        self.processor_line = self.get_processor_line()
         self.command = self.summarize_executable()
         self.script = self.generate_job()
 
@@ -204,9 +207,11 @@ class concatfastq(SampleFactory, object):
     def __init__(self, *args, **kwargs):
         super(concatfastq, self).__init__(*args, **kwargs)
         self.flowcell_folders = kwargs.get('folders')
+        self.threads = 1
         self.job="CONCATFASTQ"
         self.output = kwargs.get('output')
         self.typeofseq = kwargs.get('typeofseq')
+        self.processor_line = self.get_processor_line()
         self.runsheet_data = self.prep_concatfastq()
         self.command = self.concatfastq_executable()
         self.script = self.generate_job()
