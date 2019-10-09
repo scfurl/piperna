@@ -206,7 +206,7 @@ class concatfastq(SampleFactory, object):
         self.flowcell_folders = kwargs.get('folders')
         self.output = kwargs.get('output')
         self.typeofseq = kwargs.get('typeofseq')
-        self.runsheet_data = prep_concatfastq()
+        self.runsheet_data = self.prep_concatfastq()
         self.command = self.concatfastq_executable()
         self.script = self.generate_job()
     def __call__():
@@ -248,6 +248,7 @@ class concatfastq(SampleFactory, object):
                         files_by_handle.get(merged_fn).extend(filelist)
                     else:
                         files_by_handle.update({merged_fn: filelist})
+        return files_by_handle
 
     def concatfastq_executable(self):
         commandline=""
