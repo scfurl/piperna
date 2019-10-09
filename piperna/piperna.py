@@ -255,9 +255,12 @@ class concatfastq(SampleFactory, object):
                     else:
                         files_by_handle.update({merged_fn: filelist})
         runsheet_data=[]
+        i=1
         for key, value in files_by_handle.items():
-            runsheet_data.append({  "sample":key,
-                                    "file_list":value})
+            runsheet_data.append({  "sample" : i,
+                                    "key" : key,
+                                    "file_list" : value})
+            i = i+1
         return runsheet_data
 
     def concatfastq_executable(self):
