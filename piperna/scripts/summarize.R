@@ -20,11 +20,12 @@ require("Rsamtools")
 require("rtracklayer")
 require("BiocParallel")
 
-register(MulticoreParam(workers=8))
+
 registered()
 
 df <- read.csv(opts$r, stringsAsFactors=F)
 threads <- as.numeric(opts$t)
+register(MulticoreParam(workers=threads))
 mode <- as.character(opts$m)
 gtffile <- df$gtf[1]
 if(is.null(gtffile)){stop("GTF file not found: NULL input")}

@@ -152,7 +152,7 @@ class summarize(SampleFactory, object):
     def __init__(self, *args, **kwargs):
         super(summarize, self).__init__(*args, **kwargs)
         self.runsheet = kwargs.get('runsheet')
-        self.output = kwargs.get('output')
+        self.output = os.path.join(kwargs.get('output'), "summarizedExperiment.RDS")
         self.runsheet_data = [{"sample":"all_samples"}]
         self.job = "SUMMARIZE"
         self.threads = kwargs.get('threads')
