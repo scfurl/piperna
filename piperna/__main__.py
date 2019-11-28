@@ -35,6 +35,7 @@ def run_piperna(args=None):
     parser.add_argument('--mfl', '-mf', type=int, default=400, help='Mean fragment length (kallisto ONLY)')
     parser.add_argument('--sfl', '-sf', type=int, default=20, help='SD fragment length (kallisto ONLY)')
     parser.add_argument('--count', '-co', action='store_true', default=True, help='Run Count (STAR Only)')
+    parser.add_argument('--install', '-i', type=str, default=None, help='FOR GENOMESFILE: location of file to install as a new genomes.json file, existing genomes.json will be erased')
     parser.add_argument('--outSAMtype', '-st', type=str, default='BAM SortedByCoordinate', help='To define type of SAM/BAM output (STAR Only)')
     parser.add_argument('--addSTARstring', '-a', type=str, default='', help='Additional STAR arguments to be run on all jobs in runsheet (STAR Only)')
     parser.add_argument('--log_prefix', '-l', type=str, default='piperna.log', help='Prefix specifying log files for henipipe output from henipipe calls. OPTIONAL')
