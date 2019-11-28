@@ -29,7 +29,7 @@ threads <- as.numeric(opts$t)
 register(MulticoreParam(workers=threads))
 mode <- as.character(opts$m)
 gtffile <- df$gtf[1]
-yield_size <- opts$y*1e6
+yield_size <- as.numeric(opts$y)*1e6
 if(is.null(gtffile)){stop("GTF file not found: NULL input")}
 if(!file.exists(gtffile)){stop(paste0("GTF file not found: ", gtffile))}
 message(paste0("Loading gtf file: ", gtffile))
