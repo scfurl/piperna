@@ -52,7 +52,7 @@ if(df$software[1]=="STAR"){
 	if(!all(file.exists(filenames))){stop("All Bam files not found")}
 	message("All Bam files in runsheet found")
 	bamfiles <- BamFileList(filenames, yieldSize=20000000)
-	message("Summarizing Overlap")
+	message(paste0("Summarizing Overlap: Using ", threads, " threads"))
 	se <- summarizeOverlaps(features=genes,
 	                        reads=bamfiles,
 	                        mode=mode,
