@@ -8,6 +8,7 @@ Usage:
 Options:
    -r --runsheet Runsheet location [default: ./runsheet.csv].
    -t --threads Number of threads [default: 8].
+   -y --yield_size Number of records to yield each time the file is read in millions [default: 8].
    -m --mode Summarize overlap mode [default: Union].
    -o --output Runsheet location [default: ./summarizedExperiment.RDS].
    -b --by Summarize by gene_id, gene_name, exons, transcripts.  This string should be found in gtf file [default: gene_id].
@@ -28,6 +29,7 @@ threads <- as.numeric(opts$t)
 register(MulticoreParam(workers=threads))
 mode <- as.character(opts$m)
 gtffile <- df$gtf[1]
+yield_size <- opts$y*1e6
 if(is.null(gtffile)){stop("GTF file not found: NULL input")}
 if(!file.exists(gtffile)){stop(paste0("GTF file not found: ", gtffile))}
 message(paste0("Loading gtf file: ", gtffile))
@@ -51,7 +53,7 @@ if(df$software[1]=="STAR"){
 	df$filenames <- filenames
 	if(!all(file.exists(filenames))){stop("All Bam files not found")}
 	message("All Bam files in runsheet found")
-	bamfiles <- BamFileList(filenames, yieldSize=20000000)
+	bamfiles <- BamFileList(filenames, yieldSize=yield_size)
 	message(paste0("Summarizing Overlap: Using ", threads, " threads"))
 	se <- summarizeOverlaps(features=genes,
 	                        reads=bamfiles,
