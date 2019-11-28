@@ -51,15 +51,15 @@ def run_piperna(args=None):
     #log
     """
     if args.job=="GENOMESFILE":
-    _ROOT = os.path.abspath(os.path.dirname(__file__))
-    if args.install is None:
-        GENOMES_JSON = os.path.join(_ROOT, 'data', 'genomes.json')
-        print(GENOMES_JSON)
-    if args.install is not None:
-        from shutil import copyfile
-        args.install = os.path.abspath(args.install)
-        copyfile(args.install, os.path.join(_ROOT, 'data', 'genomes.json'))
-    exit()
+        _ROOT = os.path.abspath(os.path.dirname(__file__))
+        if args.install is None:
+            GENOMES_JSON = os.path.join(_ROOT, 'data', 'genomes.json')
+            print(GENOMES_JSON)
+        if args.install is not None:
+            from shutil import copyfile
+            args.install = os.path.abspath(args.install)
+            copyfile(args.install, os.path.join(_ROOT, 'data', 'genomes.json'))
+        exit()
 
     #log
     if args.debug == False:
