@@ -7,6 +7,8 @@ Usage:
 
 Options:
    -r --runsheet Runsheet location [default: ./runsheet.csv].
+   -t --threads Number of threads [default: 8].
+   -m --mode Summarize overlap mode [default: Union].
    -o --output Runsheet location [default: ./summarizedExperiment.RDS].
    -b --by Summarize by gene_id, gene_name, exons, transcripts.  This string should be found in gtf file [default: gene_id].
    -s --geneshort An alternative name for the "by" argument.  This string should be found in gtf file [default: gene_name].
@@ -22,6 +24,8 @@ register(MulticoreParam(workers=8))
 registered()
 
 df <- read.csv(opts$r, stringsAsFactors=F)
+threads <- as.numeric(opts$t)
+mode <- as.character(opts$m)
 gtffile <- df$gtf[1]
 if(is.null(gtffile)){stop("GTF file not found: NULL input")}
 if(!file.exists(gtffile)){stop(paste0("GTF file not found: ", gtffile))}
@@ -50,7 +54,7 @@ if(df$software[1]=="STAR"){
 	message("Summarizing Overlap")
 	se <- summarizeOverlaps(features=genes,
 	                        reads=bamfiles,
-	                        mode="Union",
+	                        mode=mode,
 	                        singleEnd=singleend,
 	                        ignore.strand=TRUE)
 	message(paste0("Saving data as: ", opts$o))

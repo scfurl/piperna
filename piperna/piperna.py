@@ -1,26 +1,4 @@
 #!/usr/bin/python
-# PBS cluster job submission in Python for RNASeq Alignment
-#v 0.04
-
-# version notes:
-# 0.04 made the wrapper agnostic to alignment software; added make runsheet column
-# 0.03 added options for STAR arguments to be passed through a runsheet column (localSTARstr) or from command line (globalSTARstr).
-
-# RNASeq wrapper....
-
-# runsheet columns
-# 1=sample (str)
-# 2=index, (path)
-# 3=output, (path)
-# 4=fastqs, (tab separated string) - single reads only
-# 5=fastq1, read1 (tab separated string) - PE reads only
-# 6=fastq2, read2 (tab separated string) - PE reads only
-# 7=software
-# 8=localSTARStr = additional args for STAR given as a string i.e. '--seedPerWindowNmax 30'
-
-
-# programs
-#STAR - "star"
 
 import os
 from subprocess import Popen, PIPE
