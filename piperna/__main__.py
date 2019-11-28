@@ -20,7 +20,7 @@ myFormatter._fmt = "[piperna]: " + myFormatter._fmt
 
 def run_piperna(args=None):
     parser = argparse.ArgumentParser('A wrapper for running RNASeq Alignment')
-    parser.add_argument('job', type=str, choices=['MAKERUNSHEET', 'ALIGN', 'SUMMARIZE', 'CONCATFASTQ'], help='a required string denoting segment of pipeline to run.  1) "MAKERUNSHEET" - to parse a folder of fastqs; 2) "ALIGN" - to perform alignment; 3) "SUMMARIZE" - to summarize and count reads, 4) "CONCATFASTQ" - function to concatenate fastq files -i.e. for SRA upload')
+    parser.add_argument('job', type=str, choices=['MAKERUNSHEET', 'ALIGN', 'SUMMARIZE', 'CONCATFASTQ', 'GENOMESFILE'], help='a required string denoting segment of pipeline to run.  1) "MAKERUNSHEET" - to parse a folder of fastqs; 2) "ALIGN" - to perform alignment; 3) "SUMMARIZE" - to summarize and count reads, 4) "CONCATFASTQ" - function to concatenate fastq files -i.e. for SRA upload; 5) "GENOMESFILE" - print location of genomes.json file.')
     parser.add_argument('--fastq_folder', '-fq', type=str, help='For MAKERUNSHEET only: Pathname of fastq folder (files should be organized in folders named by sample)')
     parser.add_argument('--genome_key', '-gk', default="default", type=str, help='For MAKERUNSHEET only: abbreviation to use "installed" genomes in the runsheet (See README.md for more details')
     parser.add_argument('--sample_flag', '-f', type=str, default="", help='FOR MAKERUNSHEET only string to identify samples of interest in a fastq folder')
@@ -49,7 +49,18 @@ def run_piperna(args=None):
 
     #log
     """
+    if args.job=="GENOMESFILE":
+    _ROOT = os.path.abspath(os.path.dirname(__file__))
+    if args.install is None:
+        GENOMES_JSON = os.path.join(_ROOT, 'data', 'genomes.json')
+        print(GENOMES_JSON)
+    if args.install is not None:
+        from shutil import copyfile
+        args.install = os.path.abspath(args.install)
+        copyfile(args.install, os.path.join(_ROOT, 'data', 'genomes.json'))
+    exit()
 
+    #log
     if args.debug == False:
         LOGGER.info("Logging to %s... examine this file if samples fail." % args.log_prefix)
 
