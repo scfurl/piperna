@@ -167,7 +167,7 @@ class summarize(SampleFactory, object):
     def summarize_executable(self):
         commandline=""
         command = []
-        modules = """\nmodule load R\n"""
+        modules = """\nmodule load R/3.5.0\n"""
         commandline = """echo '\n[SUMMARIZE] Running SUMMARIZE... Output:\n'\nRscript %s -r %s -o %s -t %s \n""" % (SUMMARIZE_SCRIPT, self.runsheet, self.output, self.threads)
         commandline = modules + commandline
         #print(commandline.__class__.__name__)
