@@ -63,7 +63,7 @@ if(df$software[1]=="STAR"){
 	message(paste0("Saving data as: ", opts$o))
 	mcols(se)[[opts$by]]=mcols(gff0)[[opts$by]][match(rownames(se), mcols(gff0)[[opts$by]])]
 	#all(mcols(se)[[opts$by]]==rownames(se))
-	mcols(se)[['gene_short']]<-mcols(gff0)[[opts$geneshort]][match(rownames(se), mcols(gff0)[[opts$by]])]
+	mcols(se)[['gene_short_name']]<-mcols(gff0)[[opts$geneshort]][match(rownames(se), mcols(gff0)[[opts$by]])]
 	colnames(se)<-df$filenames
 	colData(se)<-DataFrame(df)
 	#saveRDS(se, "SE_32cores.RDS")

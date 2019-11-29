@@ -32,7 +32,7 @@ cd ~/Box\ Sync/PI_FurlanS/computation/develop/piperna/
 rm dist/*
 python3 setup.py sdist bdist_wheel
 python3 -m twine upload dist/*
-
+scfurl
 
 
 **At SCRI do the following**
