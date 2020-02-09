@@ -37,6 +37,15 @@ class SampleFactory:
     def id_generator(self, size=10, chars=string.ascii_uppercase + string.digits):
         return ''.join(random.choice(chars) for _ in range(size))
 
+    def get_runmode(self):
+        mode = ""
+        if "fastq1" in self.runsheet_data[0]:
+            if "fastq2" in self.runsheet_data[0]:
+                mode = "pe"
+        if "fastqs" in self.runsheet_data[0]:
+            mode = "single"
+        return mode
+
     def run_job(self):
         popen_command = self.environs.popen_command
         for script in self.bash_scripts:
@@ -132,13 +141,13 @@ class environs:
 class Star(SampleFactory, object):
     def __init__(self, *args, **kwargs):
         super(Star, self).__init__(*args, **kwargs)
-        self.job = "STAR_ALIGN"
+        self.job = "PIPERNA_STAR"
         self.out_sam_type = kwargs.get('out_sam_type')
         self.count = kwargs.get('count')
         self.global_add_STAR_string = kwargs.get('global_add_STAR_string')
         self.runmode = self.get_runmode()
         self.command = self.Star_executable()
-        self.script = self.generate_job()
+        self.bash_scripts = self.generate_job(self.commands, self.job)
     def __call__():
         pass
 
@@ -160,20 +169,21 @@ class Star(SampleFactory, object):
             commandline = """\nSTAR --genomeDir %s --runThreadN %s --readFilesIn %s --outFileNamePrefix %s --readFilesCommand zcat --outSAMtype %s %s""" % (sample['index'], self.threads, fastq_line, sample['output'], self.out_sam_type, localSTARStr)
             if self.count:
                 commandline = commandline + """ --quantMode GeneCounts"""
-            commandline = modules + commandline + " " + self.global_add_STAR_string
+            commandline = commandline + " " + self.global_add_STAR_string
             #print(commandline.__class__.__name__)
-            command.append(commandline+"\n")
+            command.append([sample['sample'], commandline])
         return command
 
 class kallisto(SampleFactory, object):
     def __init__(self, *args, **kwargs):
         super(kallisto, self).__init__(*args, **kwargs)
+        self.job = "PIPERNA_KALLISTO"
         self.runmode = self.get_runmode()
         self.mfl = kwargs.get('mfl')
         self.sfl = kwargs.get('sfl')
         self.processor_line = self.get_processor_line()
         self.command = self.kallisto_executable()
-        self.script = self.generate_job()
+        self.bash_scripts = self.generate_job(self.commands, self.job)
     def __call__():
         pass
 
@@ -189,7 +199,7 @@ class kallisto(SampleFactory, object):
             commandline = """\nkallisto quant -i %s -o %s %s %s""" % (sample['index'], sample['output'], sample['single_info'], sample['fastqs'].replace("\t", " "))
             commandline = modules + commandline
             #print(commandline.__class__.__name__)
-            command.append(commandline)
+            command.append([sample['sample'], commandline])
         return command
 
 class summarize(SampleFactory, object):
@@ -198,11 +208,11 @@ class summarize(SampleFactory, object):
         self.runsheet = kwargs.get('runsheet')
         self.output = os.path.join(kwargs.get('output'), "summarizedExperiment.RDS")
         self.runsheet_data = [{"sample":"all_samples"}]
-        self.job = "SUMMARIZE"
+        self.job = "PIPERNA_SUMMARIZE"
         self.threads = kwargs.get('threads')
         self.processor_line = self.get_processor_line()
         self.command = self.summarize_executable()
-        self.script = self.generate_job()
+        self.bash_scripts = self.generate_job(self.commands, self.job)
 
 
     def __call__():
@@ -212,7 +222,7 @@ class summarize(SampleFactory, object):
         commandline=""
         command = []
         modules = """\nmodule load R/3.5.0\n"""
-        commandline = """echo '\n[SUMMARIZE] Running SUMMARIZE... Output:\n'\nRscript %s -r %s -o %s -t %s \n""" % (SUMMARIZE_SCRIPT, self.runsheet, self.output, self.threads)
+        commandline = """echo '\n[PIPERNA_SUMMARIZE] Running SUMMARIZE... Output:\n'\nRscript %s -r %s -o %s -t %s \n""" % (SUMMARIZE_SCRIPT, self.runsheet, self.output, self.threads)
         commandline = modules + commandline
         #print(commandline.__class__.__name__)
         command.append(commandline)

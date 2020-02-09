@@ -20,7 +20,7 @@ myFormatter._fmt = "[piperna]: " + myFormatter._fmt
 
 def run_piperna(args=None):
     parser = argparse.ArgumentParser('A wrapper for running RNASeq Alignment')
-    parser.add_argument('job', type=str, choices=['MAKERUNSHEET', 'ALIGN', 'SUMMARIZE', 'CONCATFASTQ', 'GENOMESFILE'], help='a required string denoting segment of pipeline to run.  1) "MAKERUNSHEET" - to parse a folder of fastqs; 2) "ALIGN" - to perform alignment; 3) "SUMMARIZE" - to summarize and count reads, 4) "CONCATFASTQ" - function to concatenate fastq files -i.e. for SRA upload; 5) "GENOMESFILE" - print location of genomes.json file.')
+    parser.add_argument('job', type=str, choices=['MAKERUNSHEET', 'ALIGN_STAR', 'ALIGN_KALLISTO', 'SUMMARIZE', 'CONCATFASTQ', 'GENOMESFILE'], help='a required string denoting segment of pipeline to run.  1) "MAKERUNSHEET" - to parse a folder of fastqs; 2) "ALIGN" - to perform alignment using STAR or KALLISTO; 3) "SUMMARIZE" - to summarize and count reads, 4) "CONCATFASTQ" - function to concatenate fastq files -i.e. for SRA upload; 5) "GENOMESFILE" - print location of genomes.json file.')
     parser.add_argument('--fastq_folder', '-fq', type=str, help='For MAKERUNSHEET only: Pathname of fastq folder (files should be organized in folders named by sample)')
     parser.add_argument('--genome_key', '-gk', default="default", type=str, help='For MAKERUNSHEET only: abbreviation to use "installed" genomes in the runsheet (See README.md for more details')
     parser.add_argument('--sample_flag', '-f', type=str, default="", help='FOR MAKERUNSHEET only string to identify samples of interest in a fastq folder')
@@ -29,7 +29,7 @@ def run_piperna(args=None):
     parser.add_argument('--software', '-s', type=str, choices=['STAR', 'kallisto'], default="STAR", help='To set desired software, required and used for MAKERUNSHEET only')
     parser.add_argument('--output', '-o', type=str, default=".", help='To set output path, required for MAKERUNSHEET; OPTIONAL for SUMMARIZE-- default for SUMMARIZE is ./SummarizedExperiment.RDS')
     parser.add_argument('--debug', '-d', action='store_true', help='To print commands (For testing flow)')
-    parser.add_argument('--cluster', '-c', type=str, default='PBS', choices=['PBS', 'SLURM'], help='Cluster software.  OPTIONAL Currently supported: PBS and SLURM')
+    parser.add_argument('--cluster', '-c', type=str, default='SLURM', choices=['PBS', 'SLURM'], help='Cluster software.  OPTIONAL Currently supported: PBS and SLURM')
     parser.add_argument('--user', '-u', type=str, default='sfurla', help='user for submitting jobs - defaults to username.  OPTIONAL')
     parser.add_argument('--threads', '-th', type=int, default=4, help='To set number of cores')
     parser.add_argument('--mfl', '-mf', type=int, default=400, help='Mean fragment length (kallisto ONLY)')
