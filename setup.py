@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
     setuptools.setup(
     name="piperna",
-    version="0.7",
+    version="0.8",
     author="Scott Furlan",
     author_email="scottfurlan@gmail.com",
     description="A python wrapper for fast and parallel processing of bulk RNA Seq data",
@@ -50,7 +50,7 @@ module load Python/3.6.7-foss-2016b-fh1
 python3 -m pip install --user pipx
 python3 -m pipx ensurepath
 pipx install --include-deps piperna
-pipx install --spec git+https://github.com/scfurl/piperna --include-deps piperna 
+pipx install --spec git+https://github.com/scfurl/piperna@cleaner --include-deps piperna 
 
 
 piperna CONCATFASTQ -fc /archive/furlan_s/seq/cellranger/181015-NHPTreg/HHJJ7BGX5/outs/fastq_path,/archive/furlan_s/seq/cellranger/181015-NHPTreg/HWVFMBGX3/outs/fastq_path -o /archive/furlan_s/data_submission

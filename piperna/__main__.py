@@ -20,7 +20,7 @@ myFormatter._fmt = "[piperna]: " + myFormatter._fmt
 
 def run_piperna(args=None):
     parser = argparse.ArgumentParser('A wrapper for running RNASeq Alignment')
-    parser.add_argument('job', type=str, choices=['MAKERUNSHEET', 'ALIGN_STAR', 'ALIGN_KALLISTO', 'SUMMARIZE', 'CONCATFASTQ', 'GENOMESFILE'], help='a required string denoting segment of pipeline to run.  1) "MAKERUNSHEET" - to parse a folder of fastqs; 2) "ALIGN" - to perform alignment using STAR or KALLISTO; 3) "SUMMARIZE" - to summarize and count reads, 4) "CONCATFASTQ" - function to concatenate fastq files -i.e. for SRA upload; 5) "GENOMESFILE" - print location of genomes.json file.')
+    parser.add_argument('job', type=str, choices=['MAKERUNSHEET', 'ALIGN', 'SUMMARIZE', 'CONCATFASTQ', 'GENOMESFILE'], help='a required string denoting segment of pipeline to run.  1) "MAKERUNSHEET" - to parse a folder of fastqs; 2) "ALIGN" - to perform alignment using STAR or KALLISTO; 3) "SUMMARIZE" - to summarize and count reads, 4) "CONCATFASTQ" - function to concatenate fastq files -i.e. for SRA upload; 5) "GENOMESFILE" - print location of genomes.json file.')
     parser.add_argument('--fastq_folder', '-fq', type=str, help='For MAKERUNSHEET only: Pathname of fastq folder (files should be organized in folders named by sample)')
     parser.add_argument('--genome_key', '-gk', default="default", type=str, help='For MAKERUNSHEET only: abbreviation to use "installed" genomes in the runsheet (See README.md for more details')
     parser.add_argument('--sample_flag', '-f', type=str, default="", help='FOR MAKERUNSHEET only string to identify samples of interest in a fastq folder')
@@ -32,6 +32,7 @@ def run_piperna(args=None):
     parser.add_argument('--cluster', '-c', type=str, default='SLURM', choices=['PBS', 'SLURM'], help='Cluster software.  OPTIONAL Currently supported: PBS and SLURM')
     parser.add_argument('--user', '-u', type=str, default='sfurla', help='user for submitting jobs - defaults to username.  OPTIONAL')
     parser.add_argument('--threads', '-th', type=int, default=4, help='To set number of cores')
+    parser.add_argument('--gb_ram', '-gb', type=int, default=None, help='To set gb_ram')
     parser.add_argument('--mfl', '-mf', type=int, default=400, help='Mean fragment length (kallisto ONLY)')
     parser.add_argument('--sfl', '-sf', type=int, default=20, help='SD fragment length (kallisto ONLY)')
     parser.add_argument('--count', '-co', action='store_true', default=True, help='Run Count (STAR Only)')
@@ -114,14 +115,14 @@ def run_piperna(args=None):
     if args.job == "ALIGN":
         if args.software == "STAR":
             Star = piperna.Star(runsheet_data = list(parsed_runsheet), user=args.user, \
-                debug=args.debug, threads=args.threads, log=args.log_prefix, \
+                debug=args.debug, threads=args.threads, gb_ram=str(args.gb_ram), log=args.log_prefix, \
                 count=args.count, out_sam_type=args.outSAMtype, \
                 global_add_STAR_string=args.addSTARstring, cluster=args.cluster)
             Star.run_job()
 
         if args.software == "kallisto":
             kallisto = piperna.kallisto(runsheet_data = list(parsed_runsheet), user=args.user, \
-                debug=args.debug, threads=args.threads, log=args.log_prefix, \
+                debug=args.debug, threads=args.threads, gb_ram=str(args.gb_ram), log=args.log_prefix, \
                 mfl = args.mfl, sfl = args.sfl, cluster=args.cluster)
             kallisto.run_Job()
 
@@ -132,5 +133,5 @@ def run_piperna(args=None):
             else :
                 args.output = os.path.abspath(args.output)
         summarize = piperna.summarize(runsheet = args.runsheet, user=args.user, \
-                debug=args.debug, threads=args.threads, log=args.log_prefix, cluster=args.cluster, output = args.output)
+                debug=args.debug, threads=args.threads, log=args.log_prefix, gb_ram=str(args.gb_ram), cluster=args.cluster, output = args.output)
         summarize.run_job()

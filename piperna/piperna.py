@@ -11,6 +11,7 @@ import string
 import random
 from itertools import chain, compress
 import json
+import pdb
 
 _ROOT = os.path.abspath(os.path.dirname(__file__))
 #GENOMES_JSON = os.path.join('/Users/sfurla/Box Sync/PI_FurlanS/computation/develop/piperna/piperna/data/genomes.json')
@@ -19,8 +20,8 @@ SUMMARIZE_SCRIPT = os.path.join(_ROOT, 'scripts', 'summarize.R')
 ENVIRONS_JSON = os.path.join(_ROOT, 'data', 'environs.json')
 
 class SampleFactory:
+    def __init__(self, *args, **kwargs):
         self.environs = environs(cluster = kwargs.get('cluster'), user = kwargs.get('user'), log = kwargs.get('log'), threads = kwargs.get('threads'), gb_ram = kwargs.get('gb_ram'))
-
         #remove later
         self.user = kwargs.get('user')
         self.cluster = kwargs.get('cluster')
@@ -63,9 +64,6 @@ class SampleFactory:
             if self.debug==False:
                 print(out)
                 time.sleep(0.1)
-
-
-
 
 class environs:
     def __init__(self, *args, **kwargs):
@@ -127,13 +125,14 @@ class environs:
         lines_parsed = []
         global to_test
         to_test=[lines_unparsed, values_to_insert, fn_args]
+        #pdb.set_trace()
         for i in range(len(lines_unparsed)):
             if values_to_insert[i][0] is "":
                 lines_parsed.append(lines_unparsed[i])
             else:
                 string=lines_unparsed[i]
                 for j in range(len(values_to_insert[i])):
-                    string = re.sub("<--{0}-->".format(j), fn_args.get(values_to_insert[i][j]), string)
+                    string = re.sub("<--{0}-->".format(j), str(fn_args.get(values_to_insert[i][j])), string)
                 lines_parsed.append(string)
         return "\n".join(lines_parsed)
 
@@ -146,8 +145,8 @@ class Star(SampleFactory, object):
         self.count = kwargs.get('count')
         self.global_add_STAR_string = kwargs.get('global_add_STAR_string')
         self.runmode = self.get_runmode()
-        self.command = self.Star_executable()
-        self.bash_scripts = self.generate_job(self.commands, self.job)
+        self.commands = self.Star_executable()
+        self.bash_scripts = self.environs.generate_job(self.commands, self.job)
     def __call__():
         pass
 
@@ -182,8 +181,8 @@ class kallisto(SampleFactory, object):
         self.mfl = kwargs.get('mfl')
         self.sfl = kwargs.get('sfl')
         self.processor_line = self.get_processor_line()
-        self.command = self.kallisto_executable()
-        self.bash_scripts = self.generate_job(self.commands, self.job)
+        self.commands = self.kallisto_executable()
+        self.bash_scripts = self.environs.generate_job(self.commands, self.job)
     def __call__():
         pass
 
@@ -210,9 +209,8 @@ class summarize(SampleFactory, object):
         self.runsheet_data = [{"sample":"all_samples"}]
         self.job = "PIPERNA_SUMMARIZE"
         self.threads = kwargs.get('threads')
-        self.processor_line = self.get_processor_line()
-        self.command = self.summarize_executable()
-        self.bash_scripts = self.generate_job(self.commands, self.job)
+        self.commands = self.summarize_executable()
+        self.bash_scripts = self.environs.generate_job(self.commands, self.job)
 
 
     def __call__():
@@ -221,11 +219,9 @@ class summarize(SampleFactory, object):
     def summarize_executable(self):
         commandline=""
         command = []
-        modules = """\nmodule load R/3.5.0\n"""
         commandline = """echo '\n[PIPERNA_SUMMARIZE] Running SUMMARIZE... Output:\n'\nRscript %s -r %s -o %s -t %s \n""" % (SUMMARIZE_SCRIPT, self.runsheet, self.output, self.threads)
-        commandline = modules + commandline
         #print(commandline.__class__.__name__)
-        command.append(commandline)
+        command.append(["Samples", commandline])
         return command
 
 class concatfastq(SampleFactory, object):
@@ -238,8 +234,8 @@ class concatfastq(SampleFactory, object):
         self.typeofseq = kwargs.get('typeofseq')
         self.processor_line = self.get_processor_line()
         self.runsheet_data = self.prep_concatfastq()
-        self.command = self.concatfastq_executable()
-        self.script = self.generate_job()
+        self.commands = self.concatfastq_executable()
+        self.script = self.environs.generate_job(self.commands, self.job)
 
     def __call__():
         pass
