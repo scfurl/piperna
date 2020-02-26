@@ -108,7 +108,8 @@ class environs:
                                     COMMAND = commands[i][1],
                                     RAM = ram,
                                     THREADS = threads,
-                                    USER = self.user)
+                                    USER = self.user,
+                                    TIME = str(datetime.now().strftime("%Y-%m-%d_%H:%M:%S")))
             bash_scripts.append(bash_script)
         return bash_scripts
 
