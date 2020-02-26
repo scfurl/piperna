@@ -34,7 +34,7 @@ def run_piperna(args=None):
     parser.add_argument('--user', '-u', type=str, default='sfurla', help='user for submitting jobs - defaults to username.  OPTIONAL')
     parser.add_argument('--threads', '-th', type=int, default=4, help='To set number of cores')
     parser.add_argument('--gb_ram', '-gb', type=int, default=None, help='To set gb_ram')
-    parser.add_argument('--additional_header', '-h', type=str, default=None, help='Additional bash header lines')
+    parser.add_argument('--additional_header', '-ah', type=str, default=None, help='Additional bash header lines')
     parser.add_argument('--mfl', '-mf', type=int, default=400, help='Mean fragment length (kallisto ONLY)')
     parser.add_argument('--sfl', '-sf', type=int, default=20, help='SD fragment length (kallisto ONLY)')
     parser.add_argument('--count', '-co', action='store_true', default=True, help='Run Count (STAR Only)')
