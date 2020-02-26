@@ -1,21 +1,37 @@
 {
     "blank": {
-        "fasta": "ADD_BOWTIE_INDEX_HERE - i.e. path to the Bowtie2 indexed FASTA genome file",
+        "fasta": "ADD_STAR_INDEX_HERE - i.e. path to the STAR indexed FASTA genome file",
         "gtf": "ADD_GTF FILE HERE"
     },
-    "default": {
+    "default_scri": {
         "fasta": "/active/furlan_s/refs/hg38/star_indices_overhang100",
         "gtf": "/active/furlan_s/refs/hg38/gencode.v30.chr_patch_hapl_scaff.annotation.gtf"
     },
-    "shivani_bulk": {
+    "default": {
+        "fasta": "/fh/fast/furlan_s/grp/refs/GRCh38/star_indices_overhang100",
+        "gtf": "/fh/fast/furlan_s/grp/refs/GRCh38/gencode_v33.gtf"
+    },
+    "GRCm38": {
+        "fasta": "/fh/fast/furlan_s/grp/refs/GRCm38/star_indices_overhang100",
+        "gtf": "/fh/fast/furlan_s/grp/refs/GRCm38/gencode_M24.gtf"
+    },
+    "GRCh38": {
+        "fasta": "/fh/fast/furlan_s/grp/refs/GRCh38/star_indices_overhang100",
+        "gtf": "/fh/fast/furlan_s/grp/refs/GRCh38/gencode_v33.gtf"
+    },
+    "NotchTG": {
+        "fasta": "/fh/fast/furlan_s/grp/refs/GRCh38/TG/Notch/star_indices_overhang100",
+        "gtf": "/fh/fast/furlan_s/grp/refs/GRCh38/TG/Notch/genes.gtf"
+    },
+    "shivani_bulk_scri": {
         "fasta": "/home/sfurla/software/cellranger/refdata-cellranger-3.0.0/GRCm38_KpOxCy/star",
         "gtf": "/home/sfurla/software/cellranger/refdata-cellranger-3.0.0/GRCm38_KpOxCy/genes/genes.gtf"
     },
-    "notch_bulk": {
+    "notch_bulk_scri": {
         "fasta": "/home/sfurla/refs/GRCh38/TG/star_indices_overhang100/",
         "gtf": "/home/sfurla/refs/GRCh38/TG/genes.gtf"
     },
-    "mmul8": {
+    "mmul8_scri": {
         "fasta": "/active/furlan_s/refs/Mmul8v2/star",
         "gtf": "unk.gtf"
     }
