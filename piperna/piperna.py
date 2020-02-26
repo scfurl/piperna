@@ -72,7 +72,7 @@ class environs:
         self.log = kwargs.get('log')
         self.additional_header = kwargs.get('additional_header')
         if self.additional_header is None:
-            self.additional_header = ""
+            self.additional_header = "#"
         self.environs_data = self.load_environs(ENVIRONS_JSON).get(self.cluster)
         self.popen_command = self.environs_data["popen"]
         self.threads = kwargs.get('threads')
@@ -173,7 +173,7 @@ class Star(SampleFactory, object):
             commandline = """\nSTAR --genomeDir %s --runThreadN %s --readFilesIn %s --outFileNamePrefix %s --readFilesCommand zcat --outSAMtype %s %s""" % (sample['index'], self.threads, fastq_line, sample['output'], self.out_sam_type, localSTARStr)
             if self.count:
                 commandline = commandline + """ --quantMode GeneCounts"""
-            commandline = commandline + " " + self.global_add_STAR_string
+            #commandline = commandline + " " + self.global_add_STAR_string
             #print(commandline.__class__.__name__)
             command.append([sample['sample'], commandline])
         return command
