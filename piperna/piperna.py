@@ -74,6 +74,7 @@ class environs:
         self.environs_data = self.load_environs(ENVIRONS_JSON).get(self.cluster)
         self.popen_command = self.environs_data["popen"]
         self.threads = kwargs.get('threads')
+        self.additional_header = kwargs.get('additional_header')
         self.ram = kwargs.get('gb_ram')
 
     def id_generator(self, size=10, chars=string.ascii_uppercase + string.digits):
@@ -108,6 +109,7 @@ class environs:
                                     JOB_NAME = (job + "_" + commands[i][0]), \
                                     COMMAND = commands[i][1],
                                     RAM = ram,
+                                    HEADER = self.additional_header,
                                     THREADS = threads,
                                     USER = self.user,
                                     TIME = str(datetime.now().strftime("%Y-%m-%d_%H:%M:%S")))

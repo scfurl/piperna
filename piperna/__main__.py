@@ -34,6 +34,7 @@ def run_piperna(args=None):
     parser.add_argument('--user', '-u', type=str, default='sfurla', help='user for submitting jobs - defaults to username.  OPTIONAL')
     parser.add_argument('--threads', '-th', type=int, default=4, help='To set number of cores')
     parser.add_argument('--gb_ram', '-gb', type=int, default=None, help='To set gb_ram')
+    parser.add_argument('--additional_header', '-h', type=str, default=None, help='Additional bash header lines')
     parser.add_argument('--mfl', '-mf', type=int, default=400, help='Mean fragment length (kallisto ONLY)')
     parser.add_argument('--sfl', '-sf', type=int, default=20, help='SD fragment length (kallisto ONLY)')
     parser.add_argument('--count', '-co', action='store_true', default=True, help='Run Count (STAR Only)')
@@ -116,14 +117,14 @@ def run_piperna(args=None):
     if args.job == "ALIGN":
         if args.software == "STAR":
             Star = piperna.Star(runsheet_data = list(parsed_runsheet), user=args.user, \
-                debug=args.debug, threads=args.threads, gb_ram=str(args.gb_ram), log=args.log_prefix, \
+                debug=args.debug, threads=args.threads, additional_header=additional_header, gb_ram=str(args.gb_ram), log=args.log_prefix, \
                 count=args.count, out_sam_type=args.outSAMtype, \
                 global_add_STAR_string=args.addSTARstring, cluster=args.cluster)
             Star.run_job()
 
         if args.software == "kallisto":
             kallisto = piperna.kallisto(runsheet_data = list(parsed_runsheet), user=args.user, \
-                debug=args.debug, threads=args.threads, gb_ram=str(args.gb_ram), log=args.log_prefix, \
+                debug=args.debug, threads=args.threads, additional_header=additional_header, gb_ram=str(args.gb_ram), log=args.log_prefix, \
                 mfl = args.mfl, sfl = args.sfl, cluster=args.cluster)
             kallisto.run_Job()
 
@@ -134,5 +135,5 @@ def run_piperna(args=None):
             else :
                 args.output = os.path.abspath(args.output)
         summarize = piperna.summarize(runsheet = args.runsheet, user=args.user, \
-                debug=args.debug, threads=args.threads, log=args.log_prefix, gb_ram=str(args.gb_ram), cluster=args.cluster, output = args.output)
+                debug=args.debug, threads=args.threads, additional_header=additional_header, log=args.log_prefix, gb_ram=str(args.gb_ram), cluster=args.cluster, output = args.output)
         summarize.run_job()
