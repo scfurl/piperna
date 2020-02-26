@@ -74,10 +74,6 @@ class environs:
         self.environs_data = self.load_environs(ENVIRONS_JSON).get(self.cluster)
         self.popen_command = self.environs_data["popen"]
         self.threads = kwargs.get('threads')
-        self.additional_header = kwargs.get('additional_header')
-        print(self.additional_header)
-        if self.additional_header is None:
-            self.additional_header = ""
         self.ram = kwargs.get('gb_ram')
 
     def id_generator(self, size=10, chars=string.ascii_uppercase + string.digits):
@@ -151,6 +147,10 @@ class Star(SampleFactory, object):
         self.out_sam_type = kwargs.get('out_sam_type')
         self.count = kwargs.get('count')
         self.global_add_STAR_string = kwargs.get('global_add_STAR_string')
+        self.additional_header = kwargs.get('additional_header')
+        print(self.additional_header)
+        if self.additional_header is None:
+            self.additional_header = ""
         self.runmode = self.get_runmode()
         self.commands = self.Star_executable()
         self.bash_scripts = self.environs.generate_job(self.commands, self.job)
@@ -187,6 +187,10 @@ class kallisto(SampleFactory, object):
         self.runmode = self.get_runmode()
         self.mfl = kwargs.get('mfl')
         self.sfl = kwargs.get('sfl')
+        self.additional_header = kwargs.get('additional_header')
+        print(self.additional_header)
+        if self.additional_header is None:
+            self.additional_header = ""
         self.processor_line = self.get_processor_line()
         self.commands = self.kallisto_executable()
         self.bash_scripts = self.environs.generate_job(self.commands, self.job)
@@ -216,6 +220,10 @@ class summarize(SampleFactory, object):
         self.runsheet_data = [{"sample":"all_samples"}]
         self.job = "PIPERNA_SUMMARIZE"
         self.threads = kwargs.get('threads')
+        self.additional_header = kwargs.get('additional_header')
+        print(self.additional_header)
+        if self.additional_header is None:
+            self.additional_header = ""
         self.commands = self.summarize_executable()
         self.bash_scripts = self.environs.generate_job(self.commands, self.job)
 

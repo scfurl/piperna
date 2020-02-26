@@ -113,7 +113,7 @@ def run_piperna(args=None):
     args.runsheet = os.path.abspath(args.runsheet)
     parsed_runsheet = piperna.parse_runsheet(args.runsheet)
 
-    print(args)
+
     if args.job == "ALIGN":
         if args.software == "STAR":
             Star = piperna.Star(runsheet_data = list(parsed_runsheet), user=args.user, \
