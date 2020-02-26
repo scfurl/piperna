@@ -75,6 +75,7 @@ class environs:
         self.popen_command = self.environs_data["popen"]
         self.threads = kwargs.get('threads')
         self.additional_header = kwargs.get('additional_header')
+        print(self.additional_header)
         if self.additional_header is None:
             self.additional_header = ""
         self.ram = kwargs.get('gb_ram')
