@@ -29,7 +29,6 @@ class SampleFactory:
         self.threads = kwargs.get('threads')
         self.gb_ram = kwargs.get('gb_ram')
         self.cluster = kwargs.get('cluster')
-
         self.runsheet_data = kwargs.get('runsheet_data')
         self.debug = kwargs.get('debug')
         # self.log_name = kwargs.get('log')
@@ -71,6 +70,10 @@ class environs:
         self.cluster = kwargs.get('cluster')
         self.user = kwargs.get('user')
         self.log = kwargs.get('log')
+        self.additional_header = kwargs.get('additional_header')
+        print(self.additional_header)
+        if self.additional_header is None:
+            self.additional_header = ""
         self.environs_data = self.load_environs(ENVIRONS_JSON).get(self.cluster)
         self.popen_command = self.environs_data["popen"]
         self.threads = kwargs.get('threads')
@@ -147,10 +150,6 @@ class Star(SampleFactory, object):
         self.out_sam_type = kwargs.get('out_sam_type')
         self.count = kwargs.get('count')
         self.global_add_STAR_string = kwargs.get('global_add_STAR_string')
-        self.additional_header = kwargs.get('additional_header')
-        print(self.additional_header)
-        if self.additional_header is None:
-            self.additional_header = ""
         self.runmode = self.get_runmode()
         self.commands = self.Star_executable()
         self.bash_scripts = self.environs.generate_job(self.commands, self.job)
@@ -187,10 +186,6 @@ class kallisto(SampleFactory, object):
         self.runmode = self.get_runmode()
         self.mfl = kwargs.get('mfl')
         self.sfl = kwargs.get('sfl')
-        self.additional_header = kwargs.get('additional_header')
-        print(self.additional_header)
-        if self.additional_header is None:
-            self.additional_header = ""
         self.processor_line = self.get_processor_line()
         self.commands = self.kallisto_executable()
         self.bash_scripts = self.environs.generate_job(self.commands, self.job)
@@ -220,10 +215,6 @@ class summarize(SampleFactory, object):
         self.runsheet_data = [{"sample":"all_samples"}]
         self.job = "PIPERNA_SUMMARIZE"
         self.threads = kwargs.get('threads')
-        self.additional_header = kwargs.get('additional_header')
-        print(self.additional_header)
-        if self.additional_header is None:
-            self.additional_header = ""
         self.commands = self.summarize_executable()
         self.bash_scripts = self.environs.generate_job(self.commands, self.job)
 
