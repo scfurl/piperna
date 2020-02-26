@@ -149,6 +149,10 @@ class Star(SampleFactory, object):
         self.out_sam_type = kwargs.get('out_sam_type')
         self.count = kwargs.get('count')
         self.global_add_STAR_string = kwargs.get('global_add_STAR_string')
+        if self.global_add_STAR_string is None:
+            self.global_add_STAR_string = ""
+        else:
+            self.global_add_STAR_string = " "+self.global_add_STAR_string
         self.runmode = self.get_runmode()
         self.commands = self.Star_executable()
         self.bash_scripts = self.environs.generate_job(self.commands, self.job)
@@ -166,14 +170,12 @@ class Star(SampleFactory, object):
                 fastq_line = sample['fastqs'].replace('\t', ',')
             if self.runmode=="pe":
                 fastq_line = sample['fastq1'].replace('\t', ',') + " " + sample['fastq2'].replace('\t', ',')
-                #print ("Fastq line is '" + fastq_line + "'")
-            modules = """\nmodule load STAR/2.5.3a\n"""
             if 'localSTARStr' in sample:
                 localSTARStr = sample['localSTARStr']
             commandline = """\nSTAR --genomeDir %s --runThreadN %s --readFilesIn %s --outFileNamePrefix %s --readFilesCommand zcat --outSAMtype %s %s""" % (sample['index'], self.threads, fastq_line, sample['output'], self.out_sam_type, localSTARStr)
             if self.count:
                 commandline = commandline + """ --quantMode GeneCounts"""
-            #commandline = commandline + " " + self.global_add_STAR_string
+            commandline = commandline + " " + self.global_add_STAR_string
             #print(commandline.__class__.__name__)
             command.append([sample['sample'], commandline])
         return command
@@ -195,7 +197,6 @@ class kallisto(SampleFactory, object):
         commandline=""
         command = []
         for sample in self.runsheet_data:
-            modules = """\nmodule load %s\n""" % sample['module']
             if self.runmode=="single":
                 sample['single_info'] = """--single -l %s -s %s"""% (self.mfl, self.sfl)
             else:
@@ -224,7 +225,7 @@ class summarize(SampleFactory, object):
     def summarize_executable(self):
         commandline=""
         command = []
-        commandline = """echo '\n[PIPERNA_SUMMARIZE] Running SUMMARIZE... Output:\n'\nRscript %s -r %s -o %s -t %s \n""" % (SUMMARIZE_SCRIPT, self.runsheet, self.output, self.threads)
+        commandline = """\necho '\n[PIPERNA_SUMMARIZE] Running SUMMARIZE... Output:\n'\nRscript %s -r %s -o %s -t %s""" % (SUMMARIZE_SCRIPT, self.runsheet, self.output, self.threads)
         #print(commandline.__class__.__name__)
         command.append(["Samples", commandline])
         return command
