@@ -50,8 +50,9 @@ module load Python/3.6.7-foss-2016b-fh1
 python3 -m pip install --user pipx
 python3 -m pipx ensurepath
 pipx uninstall piperna
-pipx install --include-deps piperna
 pipx install --spec git+https://github.com/scfurl/piperna --include-deps piperna 
+pipx install --include-deps piperna
+
 
 
 piperna CONCATFASTQ -fc /archive/furlan_s/seq/cellranger/181015-NHPTreg/HHJJ7BGX5/outs/fastq_path,/archive/furlan_s/seq/cellranger/181015-NHPTreg/HWVFMBGX3/outs/fastq_path -o /archive/furlan_s/data_submission

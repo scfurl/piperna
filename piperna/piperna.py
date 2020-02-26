@@ -75,6 +75,8 @@ class environs:
         self.popen_command = self.environs_data["popen"]
         self.threads = kwargs.get('threads')
         self.additional_header = kwargs.get('additional_header')
+        if self.additional_header is None:
+            elf.additional_header = ""
         self.ram = kwargs.get('gb_ram')
 
     def id_generator(self, size=10, chars=string.ascii_uppercase + string.digits):
