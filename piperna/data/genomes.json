@@ -23,6 +23,10 @@
         "fasta": "/fh/fast/furlan_s/grp/refs/GRCh38/TG/Notch/star_indices_overhang100",
         "gtf": "/fh/fast/furlan_s/grp/refs/GRCh38/TG/Notch/genes.gtf"
     },
+    "GRCm38_KpOxCy": {
+        "fasta": "/fh/fast/furlan_s/grp/refs/GRCm38/TG/GRCm38_KpOxCy/star",
+        "gtf": "/fh/fast/furlan_s/grp/refs/GRCm38/TG/GRCm38_KpOxCy/genes/genes.gtf"
+    },
     "shivani_bulk_scri": {
         "fasta": "/home/sfurla/software/cellranger/refdata-cellranger-3.0.0/GRCm38_KpOxCy/star",
         "gtf": "/home/sfurla/software/cellranger/refdata-cellranger-3.0.0/GRCm38_KpOxCy/genes/genes.gtf"

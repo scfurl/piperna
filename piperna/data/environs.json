@@ -45,7 +45,7 @@
             "PIPERNA_STAR": {
                 "ram" : "8",
                 "threads" : "4",
-                "modules" : "module load STAR"
+                "modules" : "module load STAR/2.7.1a-foss-2016b"
             },
             "PIPERNA_KALLISTO": {
                 "ram" : "8",

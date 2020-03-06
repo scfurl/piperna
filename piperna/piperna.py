@@ -455,6 +455,9 @@ def make_runsheet(folder, sample_flag, genome_key, typeofseq, organized_by, outp
         dat=list(map(find_fastq_mate, ddir))
         good_dat = [i for i in dat if i.get('has_fastq') is True]
         good_dat = [i for i in good_dat if re.compile(r'.*'+sample_flag).search(i.get('directory_short'))]
+        #good_dat = [i.update({"sample":i.get('directory_short')}) 
+        for i in good_dat:
+            i.update({"sample":i.get('directory_short')})
     if(organized_by=="file" and typeofseq=="pe"):
         good_dat=find_fastqs_by_sample(folder)
     for i in good_dat:
