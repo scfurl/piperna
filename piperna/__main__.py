@@ -57,7 +57,11 @@ def run_piperna(args=None):
         _ROOT = os.path.abspath(os.path.dirname(__file__))
         if args.install is None:
             GENOMES_JSON = os.path.join(_ROOT, 'data', 'genomes.json')
-            print(GENOMES_JSON)
+            print("Showing contents og genomes.json file located at:\n"+GENOMES_JSON+"\n\n\n\n")
+            f = open(GENOMES_JSON, 'r')
+            file_contents = f.read()
+            print (file_contents+"\n\n\n\n")
+            f.close()
         if args.install is not None:
             from shutil import copyfile
             args.install = os.path.abspath(args.install)
