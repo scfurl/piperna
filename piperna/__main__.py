@@ -24,10 +24,14 @@ def run_piperna(args=None):
     parser.add_argument('--fastq_folder', '-fq', type=str, help='For MAKERUNSHEET only: Pathname of fastq folder')
     parser.add_argument('--organized_by', '-b', type=str, choices=['folder', 'file'], default='folder', help='Option to specify how fastq folder is organized')
     parser.add_argument('--genome_key', '-gk', default="default", type=str, help='For MAKERUNSHEET only: abbreviation to use "installed" genomes in the runsheet (See README.md for more details')
+    parser.add_argument('--split_char', '-sc', type=str, default="_R1_", help='Character by which to split the fastqfile name into samples, OPTIONAL and for MAKERUNSHEET only')
+    parser.add_argument('--R1_char', '-r1c', type=str, default="_R1_", help='Character by which to split the fastqfile name into read1, OPTIONAL and for MAKERUNSHEET only')
+    parser.add_argument('--R2_char', '-r2c', type=str, default="_R2_", help='Character by which to split the fastqfile name into read2, OPTIONAL and for MAKERUNSHEET only')
+    parser.add_argument('--select', '-s', type=str, default=None, help='To only run the selected row in the runsheet, OPTIONAL and for MAKERUNSHEET only')
     parser.add_argument('--sample_flag', '-f', type=str, default="", help='FOR MAKERUNSHEET only string to identify samples of interest in a fastq folder')
     parser.add_argument('--runsheet', '-r', type=str, help='tab-delim file with sample fields as defined in the script. - REQUIRED for all jobs except MAKERUNSHEET')
     parser.add_argument('--typeofseq', '-t', type=str, default = "pe", choices=['single', 'pe'], help= 'Type of sequencing performed - REQUIRED for MAKERUNSHEET and CONCATFASTQ')
-    parser.add_argument('--software', '-s', type=str, choices=['STAR', 'kallisto'], default="STAR", help='To set desired software, required and used for MAKERUNSHEET only')
+    parser.add_argument('--software', '-so', type=str, choices=['STAR', 'kallisto'], default="STAR", help='To set desired software, required and used for MAKERUNSHEET only')
     parser.add_argument('--output', '-o', type=str, default=".", help='To set output path, required for MAKERUNSHEET; OPTIONAL for SUMMARIZE-- default for SUMMARIZE is ./SummarizedExperiment.RDS')
     parser.add_argument('--debug', '-d', action='store_true', help='To print commands (For testing flow)')
     parser.add_argument('--cluster', '-c', type=str, default='SLURM', choices=['PBS', 'SLURM'], help='Cluster software.  OPTIONAL Currently supported: PBS and SLURM')
@@ -99,14 +103,17 @@ def run_piperna(args=None):
 
     if args.job=="MAKERUNSHEET":
         LOGGER.info("Parsing fastq folder - "+args.fastq_folder+" ...")
-        piperna.make_runsheet(folder=args.fastq_folder, output=args.output, typeofseq=args.typeofseq, genome_key=args.genome_key, sample_flag = args.sample_flag, software=args.software, organized_by=args.organized_by)
+        piperna.make_runsheet(folder=args.fastq_folder, output=args.output, typeofseq=args.typeofseq, \
+            genome_key=args.genome_key, sample_flag = args.sample_flag, strsplit= args.split_char, r1_char=args.R1_char, \
+            r2_char=args.R2_char, software=args.software, organized_by=args.organized_by)
         exit()
 
     if args.job=="CONCATFASTQ":
         args.flow_cell_folders = os.path.abspath(args.flow_cell_folders)
         args.output = os.path.abspath(args.output)
         LOGGER.info("Concatenating fastqs in the folder(s) - "+" and ".join(args.flow_cell_folders.split(","))+" ...")
-        concatfastqjob = piperna.concatfastq(folders=args.flow_cell_folders, output=args.output, typeofseq=args.typeofseq, cluster=args.cluster, threads = 1, log=args.log_prefix, user=args.user, debug=args.debug)
+        concatfastqjob = piperna.concatfastq(folders=args.flow_cell_folders, output=args.output, typeofseq=args.typeofseq, \
+            cluster=args.cluster, threads = 1, log=args.log_prefix, user=args.user, debug=args.debug)
         concatfastqjob.run_job()
         exit()
 
@@ -114,8 +121,9 @@ def run_piperna(args=None):
     args.runsheet = os.path.abspath(args.runsheet)
     parsed_runsheet = list(piperna.parse_runsheet(args.runsheet))
     piperna.check_runsheet(args, parsed_runsheet, verbose=args.verbose)
-    args.runsheet = os.path.abspath(args.runsheet)
-    parsed_runsheet = piperna.parse_runsheet(args.runsheet)
+    #parsed_runsheet = piperna.parse_runsheet(args.runsheet)
+    if args.select is not None:
+        parsed_runsheet = [parsed_runsheet[i-1] for i in list(piperna.parse_range_list(args.select))]
 
 
     if args.job == "ALIGN":
@@ -130,7 +138,7 @@ def run_piperna(args=None):
             kallisto = piperna.kallisto(runsheet_data = list(parsed_runsheet), user=args.user, \
                 debug=args.debug, threads=args.threads, additional_header=args.additional_header, gb_ram=str(args.gb_ram), log=args.log_prefix, \
                 mfl = args.mfl, sfl = args.sfl, cluster=args.cluster)
-            kallisto.run_Job()
+            kallisto.run_job()
 
     if args.job == "SUMMARIZE":
         if os.path.isabs(args.output) is False:
@@ -139,5 +147,6 @@ def run_piperna(args=None):
             else :
                 args.output = os.path.abspath(args.output)
         summarize = piperna.summarize(runsheet = args.runsheet, user=args.user, \
-                debug=args.debug, threads=args.threads, additional_header=args.additional_header, log=args.log_prefix, gb_ram=str(args.gb_ram), cluster=args.cluster, output = args.output)
+                debug=args.debug, threads=args.threads, additional_header=args.additional_header, log=args.log_prefix, gb_ram=str(args.gb_ram), \
+                cluster=args.cluster, output = args.output)
         summarize.run_job()

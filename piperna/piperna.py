@@ -187,7 +187,7 @@ class kallisto(SampleFactory, object):
         self.runmode = self.get_runmode()
         self.mfl = kwargs.get('mfl')
         self.sfl = kwargs.get('sfl')
-        self.processor_line = self.get_processor_line()
+        #self.processor_line = self.get_processor_line()
         self.commands = self.kallisto_executable()
         self.bash_scripts = self.environs.generate_job(self.commands, self.job)
     def __call__():
@@ -196,13 +196,18 @@ class kallisto(SampleFactory, object):
     def kallisto_executable(self):
         commandline=""
         command = []
+        fastq_line = ""
+        for sample in self.runsheet_data:
+            if "fastqs" in sample:
+                fastq_line = sample['fastqs'].replace('\t', ' ')
+            if "fastq2" in sample:
+                fastq_line = sample['fastq1'].replace('\t', ' ') + " " + sample['fastq2'].replace('\t', ' ')
         for sample in self.runsheet_data:
             if self.runmode=="single":
                 sample['single_info'] = """--single -l %s -s %s"""% (self.mfl, self.sfl)
             else:
                 sample['single_info'] = ""
             commandline = """\nkallisto quant -i %s -o %s %s %s""" % (sample['index'], sample['output'], sample['single_info'], sample['fastqs'].replace("\t", " "))
-            commandline = modules + commandline
             #print(commandline.__class__.__name__)
             command.append([sample['sample'], commandline])
         return command
@@ -399,30 +404,37 @@ def find_fastq_mate(dir, sample_flag=None, full_name=True):
     values=[dir, os.path.basename(dir), "\t".join(fastq1), "\t".join(fastq1_mate), len(fastq1)>0]
     return(dict(zip(keys, values)))
 
-def find_fastqs_by_sample(dir, strsplit="_R1_", R1_flag="_R1_", R2_flag="_R2_", full_name=True):
+def find_fastqs_by_sample(dir, strsplit, r1_char, r2_char, typeofseq, full_name=True):
     fastqs=[]
     fastq1=fq1=[]
     fastq2=fq2=[]
     sample=[]
     sample_dict=[]
+    #sort into read1 and read2
     for file in os.listdir(dir):
         if file.endswith(".fastq.gz"):
             fastqs.extend([file])
-            if "_R1_" in file:
+            if r1_char in file:
                 fastq1.extend([file])
-            if "_R2_" in file:
+            if r2_char in file:
                 fastq2.extend([file])
+    #get samples
     sample=[i.split(strsplit)[0] for i in fastq1]
+    #get uniqe samples
+    sample = list(set(sample))
     for samp in sample:
-        R1matches=list(filter(lambda x: samp+R1_flag in x, fastq1))
+        #R1matches=list(filter(lambda x: samp+r1_char in x, fastq1)) (taken out because of lane portion of string)
+        R1matches=list(filter(lambda x: samp in x, fastq1))
         R1matches=[os.path.join(dir, i) for i in R1matches]
         fastq1s="\t".join(R1matches)
-        R2matches=list(filter(lambda x: samp+R2_flag in x, fastq2))
+        #R2matches=list(filter(lambda x: samp+r2_char in x, fastq2))  (taken out because of lane portion of string)
+        R2matches=list(filter(lambda x: samp in x, fastq2)) 
         R2matches=[os.path.join(dir, i) for i in R2matches]
         fastq2s="\t".join(R2matches)
-        sample_dict.extend([{"sample":samp,
-            "fastq1":fastq1s,
-            "fastq2":fastq2s}])
+        if typeofseq=="pe":
+            sample_dict.extend([{"sample":samp, "fastq1":fastq1s, "fastq2":fastq2s}])
+        if typeofseq=="single":
+            sample_dict.extend([{"sample":samp, "fastqs":fastq1s}])
     return(sample_dict)
 
 def find_colnames(runsheet, header=True):
@@ -444,7 +456,7 @@ def load_genomes(genomes_file):
         genome_data = json.load(read_file)
     return genome_data
 
-def make_runsheet(folder, sample_flag, genome_key, typeofseq, organized_by, output=None, fasta=None, software="STAR"):
+def make_runsheet(folder, sample_flag, genome_key, typeofseq, organized_by, strsplit, r1_char, r2_char, output=None, fasta=None, software="STAR"):
     #folder = '/active/furlan_s/Data/CNR/190801_CNRNotch/fastq/mini/fastq'
     #genome_key = "shivani_bulk"
     genome_data = load_genomes(GENOMES_JSON).get(genome_key)
@@ -459,7 +471,9 @@ def make_runsheet(folder, sample_flag, genome_key, typeofseq, organized_by, outp
         for i in good_dat:
             i.update({"sample":i.get('directory_short')})
     if(organized_by=="file" and typeofseq=="pe"):
-        good_dat=find_fastqs_by_sample(folder)
+        good_dat=find_fastqs_by_sample(folder, strsplit=strsplit, r1_char=r1_char, r2_char=r2_char, typeofseq=typeofseq)
+    if(organized_by=="file" and typeofseq=="single"):
+        good_dat=find_fastqs_by_sample(folder, strsplit=strsplit, r1_char=r1_char, r2_char=r2_char, typeofseq=typeofseq)
     for i in good_dat:
         i.update({'sample': i.get('sample'), \
             'output': os.path.join(output, i.get('sample')), \
@@ -503,6 +517,29 @@ def getKeysByValues(dictOfElements, listOfValues):
     for item  in listOfItems:
         if item[1] in listOfValues:
             listOfKeys.append(item[0])
-    return  listOfKeys 
+    return  listOfKeys
 
+def parse_range_list(rl):
+    def collapse_range(ranges):
+        end = None
+        for value in ranges:
+            yield range(max(end, value.start), max(value.stop, end)) if end else value
+            end = max(end, value.stop) if end else value.stop
+    def split_range(value):
+        value = value.split(':')
+        for val, prev in zip(value, chain((None,), value)):
+            if val != '':
+                val = int(val)
+                if prev == '':
+                    val *= -1
+                yield val
+    def parse_range(r):
+        parts = list(split_range(r.strip()))
+        if len(parts) == 0:
+            return range(0, 0)
+        elif len(parts) > 2:
+            raise ValueError("Invalid range: {}".format(r))
+        return range(parts[0], parts[-1] + 1)
+    ranges = sorted(set(map(parse_range, rl.split(","))), key=lambda x: (x.start, x.stop))
+    return chain.from_iterable(collapse_range(ranges))
 

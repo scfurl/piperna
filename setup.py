@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
     setuptools.setup(
     name="piperna",
-    version="1.41",
+    version="1.5",
     author="Scott Furlan",
     author_email="scottfurlan@gmail.com",
     description="A python wrapper for fast and parallel processing of bulk RNA Seq data",
@@ -28,7 +28,7 @@ with open("README.md", "r") as fh:
 
 
 """
-cd '/Users/sfurla/OneDrive - Fred Hutchinson Cancer Research Center/computation/develop/piperna'
+cd '/Users/sfurlan/OneDrive - Fred Hutchinson Cancer Research Center/computation/develop/piperna'
 rm dist/*
 python3 setup.py sdist bdist_wheel
 python3 -m twine upload dist/*
