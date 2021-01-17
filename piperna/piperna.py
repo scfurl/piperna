@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 import os
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, run
 import argparse
 import time
 import sys
@@ -220,6 +220,7 @@ class summarize(SampleFactory, object):
         self.runsheet_data = [{"sample":"all_samples"}]
         self.job = "PIPERNA_SUMMARIZE"
         self.threads = kwargs.get('threads')
+        self.ram = self.environs.environs_data['resources'][self.job]['ram']
         self.commands = self.summarize_executable()
         self.bash_scripts = self.environs.generate_job(self.commands, self.job)
 
@@ -306,6 +307,36 @@ class concatfastq(SampleFactory, object):
             command.append(commandline)
         return command
 
+class unbam(SampleFactory, object):
+    def __init__(self, *args, **kwargs):
+        super(unbam, self).__init__(*args, **kwargs)
+        self.job = "PIPERNA_UNBAM"
+        self.runsheet_data = kwargs.get('runsheet_data')
+        self.runmode = self.get_runmode()
+        self.ram = self.environs.environs_data['resources'][self.job]['ram']
+        #self.threads = self.environs.environs_data['resources'][self.job]['threads']
+        self.commands = self.unbam_executable()
+        self.bash_scripts = self.environs.generate_job(self.commands, self.job)
+    def __call__():
+        pass
+
+    def unbam_executable(self):
+        commandline=""
+        command = []
+        fastq_line = ""
+        for sample in self.runsheet_data:
+            if not os.path.isfile(os.path.dirname(sample['fastq1'])):
+                run(["mkdir", "-p", os.path.dirname(sample['fastq1'])])
+            if self.runmode=="single":
+                fastqline = """-fq %s""" % (sample['fastq1'])
+                rmline = """gzip %s""" % (sample['fastq1'])
+            else:
+                fastqline = """-fq %s -fq2 %s""" % (sample['fastq1'], sample['fastq2'])
+                rmline = """gzip %s\ngzip %s""" % (sample['fastq1'], sample['fastq2'])
+            commandline = """\nsamtools sort -n -@ %s -m %s %s | bedtools bamtofastq -i - %s\n%s""" % (self.threads, self.ram+'G', sample['bam'], fastqline, rmline)
+            #print(commandline.__class__.__name__)
+            command.append([sample['bam'], commandline])
+        return command
 
 def convert_windows_newlines(file_name):
     """
@@ -375,6 +406,16 @@ def parse_runsheet(runsheet, header=True, colnames=None):
                 raise ValueError('Sample sheet does not match expected columns. Expects: %s' % ','.join(columns))
             entry_dict = dict(zip(columns, entries))
             yield entry_dict
+
+def find_bams(dir, sample_flag=None, full_name=True):
+    outbams=[]
+    for file in os.listdir(dir):
+        if file.endswith(".bam"):
+            if full_name:
+                    outbams.append(os.path.join(dir, file))
+            else:
+                outbams.append(file)
+    return(outbams)
 
 def find_fastq_mate(dir, sample_flag=None, full_name=True):
     fastqs=[]
@@ -455,6 +496,27 @@ def load_genomes(genomes_file):
     with open(genomes_file, "r") as read_file:
         genome_data = json.load(read_file)
     return genome_data
+
+def unbam_prep(folder, output, typeofseq, organized_by):
+    #folder = '/home/sfurlan/scratch/mullighan/bams'
+    #output = "/home/sfurlan/scratch/mullighan/fastqs"
+    if output is None:
+        output = os.path.join(os.getcwd())
+    if(organized_by=="folder"):
+        ddir=[x[0] for x in os.walk(folder)]
+        dat=list(map(find_bams, ddir))
+        dat = [val for sublist in dat for val in sublist]
+        #[run(["mkdir", "-p", re.sub(folder, output, os.path.dirname(file))]) for file in dat]
+    if(organized_by=="file"):
+        dat = find_bams(folder)
+    fastq1 = [os.path.join(re.sub(folder, output, os.path.dirname(file)), re.sub(".bam", "_R1.fastq", os.path.basename(file))) for file in dat]
+    if(typeofseq=="pe"):
+        fastq2 = [os.path.join(re.sub(folder, output, os.path.dirname(file)), re.sub(".bam", "_R2.fastq", os.path.basename(file))) for file in dat]
+        dout = [{"bam":dat[i], "fastq1":fastq1[i], "fastq2":fastq2[i]} for i in range(len(dat))]
+    else:
+        dout = [{"bam":dat[i], "fastq1":fastq1[i]} for i in range(len(dat))]
+    return dout
+
 
 def make_runsheet(folder, sample_flag, genome_key, typeofseq, organized_by, strsplit, r1_char, r2_char, output=None, fasta=None, software="STAR"):
     #folder = '/active/furlan_s/Data/CNR/190801_CNRNotch/fastq/mini/fastq'

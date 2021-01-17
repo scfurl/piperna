@@ -20,9 +20,10 @@ myFormatter._fmt = "[piperna]: " + myFormatter._fmt
 
 def run_piperna(args=None):
     parser = argparse.ArgumentParser('A wrapper for running RNASeq Alignment')
-    parser.add_argument('job', type=str, choices=['MAKERUNSHEET', 'ALIGN', 'SUMMARIZE', 'CONCATFASTQ', 'GENOMESFILE'], help='a required string denoting segment of pipeline to run.  1) "MAKERUNSHEET" - to parse a folder of fastqs; 2) "ALIGN" - to perform alignment using STAR or KALLISTO; 3) "SUMMARIZE" - to summarize and count reads, 4) "CONCATFASTQ" - function to concatenate fastq files -i.e. for SRA upload; 5) "GENOMESFILE" - print location of genomes.json file.')
+    parser.add_argument('job', type=str, choices=['MAKERUNSHEET', 'ALIGN', 'SUMMARIZE', 'CONCATFASTQ', 'GENOMESFILE', 'UNBAM'], help='a required string denoting segment of pipeline to run.  1) "MAKERUNSHEET" - to parse a folder of fastqs; 2) "ALIGN" - to perform alignment using STAR or KALLISTO; 3) "SUMMARIZE" - to summarize and count reads, 4) "CONCATFASTQ" - function to concatenate fastq files -i.e. for SRA upload; 5) "GENOMESFILE" - print location of genomes.json file. 6) "UNBAM" - convert bam to fastq')
+    parser.add_argument('--bam_folder', '-bf', type=str, help='For UNBAM only: Pathname of bam locations')
     parser.add_argument('--fastq_folder', '-fq', type=str, help='For MAKERUNSHEET only: Pathname of fastq folder')
-    parser.add_argument('--organized_by', '-b', type=str, choices=['folder', 'file'], default='folder', help='Option to specify how fastq folder is organized')
+    parser.add_argument('--organized_by', '-b', type=str, choices=['folder', 'file'], default='folder', help='Option to specify how fastq or unbam folder is organized')
     parser.add_argument('--genome_key', '-gk', default="default", type=str, help='For MAKERUNSHEET only: abbreviation to use "installed" genomes in the runsheet (See README.md for more details')
     parser.add_argument('--split_char', '-sc', type=str, default="_R1_", help='Character by which to split the fastqfile name into samples, OPTIONAL and for MAKERUNSHEET only')
     parser.add_argument('--R1_char', '-r1c', type=str, default="_R1_", help='Character by which to split the fastqfile name into read1, OPTIONAL and for MAKERUNSHEET only')
@@ -30,14 +31,14 @@ def run_piperna(args=None):
     parser.add_argument('--select', '-s', type=str, default=None, help='To only run the selected row in the runsheet, OPTIONAL and for MAKERUNSHEET only')
     parser.add_argument('--sample_flag', '-f', type=str, default="", help='FOR MAKERUNSHEET only string to identify samples of interest in a fastq folder')
     parser.add_argument('--runsheet', '-r', type=str, help='tab-delim file with sample fields as defined in the script. - REQUIRED for all jobs except MAKERUNSHEET')
-    parser.add_argument('--typeofseq', '-t', type=str, default = "pe", choices=['single', 'pe'], help= 'Type of sequencing performed - REQUIRED for MAKERUNSHEET and CONCATFASTQ')
+    parser.add_argument('--typeofseq', '-t', type=str, default = "pe", choices=['single', 'pe'], help= 'Type of sequencing performed - REQUIRED for MAKERUNSHEET, UNBAM and CONCATFASTQ')
     parser.add_argument('--software', '-so', type=str, choices=['STAR', 'kallisto'], default="STAR", help='To set desired software, required and used for MAKERUNSHEET only')
-    parser.add_argument('--output', '-o', type=str, default=".", help='To set output path, required for MAKERUNSHEET; OPTIONAL for SUMMARIZE-- default for SUMMARIZE is ./SummarizedExperiment.RDS')
+    parser.add_argument('--output', '-o', type=str, default=".", help='To set output path, required for MAKERUNSHEET, UNBAM; OPTIONAL for SUMMARIZE-- default for SUMMARIZE is ./SummarizedExperiment.RDS')
     parser.add_argument('--debug', '-d', action='store_true', help='To print commands (For testing flow)')
     parser.add_argument('--cluster', '-c', type=str, default='SLURM', choices=['PBS', 'SLURM'], help='Cluster software.  OPTIONAL Currently supported: PBS and SLURM')
-    parser.add_argument('--user', '-u', type=str, default='sfurla', help='user for submitting jobs - defaults to username.  OPTIONAL')
+    parser.add_argument('--user', '-u', type=str, default='sfurlan', help='user for submitting jobs - defaults to username.  OPTIONAL')
     parser.add_argument('--threads', '-th', type=int, default=4, help='To set number of cores')
-    parser.add_argument('--gb_ram', '-gb', type=int, default=None, help='To set gb_ram')
+    parser.add_argument('--gb_ram', '-gb', type=int, default=8, help='To set gb_ram')
     parser.add_argument('--additional_header', '-ah', type=str, default=None, help='Additional bash header lines')
     parser.add_argument('--mfl', '-mf', type=int, default=400, help='Mean fragment length (kallisto ONLY)')
     parser.add_argument('--sfl', '-sf', type=int, default=20, help='SD fragment length (kallisto ONLY)')
@@ -57,6 +58,33 @@ def run_piperna(args=None):
 
     #log
     """
+    if args.job=="UNBAM":
+        if os.path.isabs(args.bam_folder) is False:
+            if args.bam_folder == ".":
+                args.bam_folder = os.getcwd()
+            else :
+                args.bam_folder = os.path.abspath(args.bam_folder)
+        if os.path.exists(args.bam_folder) is False:
+            raise ValueError('Path: '+args.bam_folder+' not found')
+        if os.path.isabs(args.output) is False:
+            if args.output == ".":
+                args.output = os.getcwd()
+            else :
+                args.output = os.path.abspath(args.output)
+        if os.path.exists(args.output) is False:
+            raise ValueError('Path: '+args.output+' not found')
+        LOGGER.info("Parsing bam folder - "+args.bam_folder+" ...")
+        unbam_runsheet = piperna.unbam_prep(folder=args.bam_folder, output=args.output, typeofseq=args.typeofseq, \
+            organized_by=args.organized_by)
+        if args.select is not None:
+            unbam_runsheet = [unbam_runsheet[i-1] for i in list(piperna.parse_range_list(args.select))]
+        unbam_jobs = piperna.unbam(runsheet_data = unbam_runsheet, user=args.user, \
+                debug=args.debug, threads=args.threads, additional_header=args.additional_header, gb_ram=str(args.gb_ram), log=args.log_prefix, \
+                cluster=args.cluster)
+        unbam_jobs.run_job()
+        exit()
+
+
     if args.job=="GENOMESFILE":
         _ROOT = os.path.abspath(os.path.dirname(__file__))
         if args.install is None:
