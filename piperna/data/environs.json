@@ -42,16 +42,15 @@
         "3" : ["#SBATCH --ntasks=1\n#SBATCH --cpus-per-task=<--0-->","THREADS"],
         "4" : ["#SBATCH --mem-per-cpu=<--0-->000","RAM"],
         "5" : ["<--0-->","HEADER"],
-        "6" : ["cat > <--0--> <<- EOM\n<--1-->\nEOM", "TEMP_LOG_FILE|COMMAND"],
-        "7" : ["{\n<--0-->;<--1-->;} 2>&1 | tee <--2-->", "MODULES|COMMAND|TEMP_LOG_FILE"],
-        "8" : ["export t=date\nsed -e 's@^@[PIPERNA-${t}] JOB: <--0-->:\t\t@' <--1--> >> <--2-->", "JOB_NAME|TEMP_LOG_FILE|LOG_FILE"],
-        "9" : ["rm <--0-->\n", "TEMP_LOG_FILE"]
+        "6" : ["{\necho '<--1-->';<--0-->;<--1-->;} 2>&1 | tee <--2-->", "MODULES|COMMAND|TEMP_LOG_FILE"],
+        "7" : ["sed -e 's@^@[PIPERNA-<--0-->] JOB: <--1-->:\t\t@' <--2--> >> <--3-->", "TIME|JOB_NAME|TEMP_LOG_FILE|LOG_FILE"],
+        "8" : ["rm <--0-->\n", "TEMP_LOG_FILE"]
     },
         "resources" : {
             "PIPERNA_STAR": {
                 "ram" : "8",
                 "threads" : "4",
-                "modules" : "module load STAR/2.7.1a-foss-2016b"
+                "modules" : "module load STAR/2.7.6a-foss-2019b"
             },
             "PIPERNA_KALLISTO": {
                 "ram" : "8",

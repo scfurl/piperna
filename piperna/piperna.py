@@ -14,6 +14,8 @@ import json
 import pdb
 from datetime import datetime
 
+
+#_ROOT = '/home/sfurlan/.local/pipx/venvs/piperna/lib/python3.7/site-packages/piperna'
 _ROOT = os.path.abspath(os.path.dirname(__file__))
 #GENOMES_JSON = os.path.join('/Users/sfurla/Box Sync/PI_FurlanS/computation/develop/piperna/piperna/data/genomes.json')
 GENOMES_JSON = os.path.join(_ROOT, 'data', 'genomes.json')
@@ -172,10 +174,10 @@ class Star(SampleFactory, object):
                 fastq_line = sample['fastq1'].replace('\t', ',') + " " + sample['fastq2'].replace('\t', ',')
             if 'localSTARStr' in sample:
                 localSTARStr = sample['localSTARStr']
-            commandline = """\nSTAR --genomeDir %s --runThreadN %s --readFilesIn %s --outFileNamePrefix %s --readFilesCommand zcat --outSAMtype %s %s""" % (sample['index'], self.threads, fastq_line, sample['output'], self.out_sam_type, localSTARStr)
+            commandline = """\nSTAR --genomeDir %s --runThreadN %s --readFilesIn %s --outFileNamePrefix %s/ --readFilesCommand zcat --outSAMtype %s %s""" % (sample['index'], self.threads, fastq_line, sample['output'], self.out_sam_type, localSTARStr)
             if self.count:
-                commandline = commandline + """ --quantMode GeneCounts"""
-            commandline = commandline + " " + self.global_add_STAR_string
+                commandline = commandline + """--quantMode GeneCounts"""
+            commandline = commandline + self.global_add_STAR_string
             #print(commandline.__class__.__name__)
             command.append([sample['sample'], commandline])
         return command
@@ -417,21 +419,21 @@ def find_bams(dir, sample_flag=None, full_name=True):
                 outbams.append(file)
     return(outbams)
 
-def find_fastq_mate(dir, sample_flag=None, full_name=True):
+def find_fastq_mate(dir, r1_char, r2_char, sample_flag=None, full_name=True):
     fastqs=[]
     fastq1=[]
     fastq2=[]
     for file in os.listdir(dir):
         if file.endswith(".fastq.gz"):
             fastqs.extend([file])
-            if "_R1_" in file:
+            if r1_char in file:
                 fastq1.extend([file])
-            if "_R2_" in file:
+            if r2_char in file:
                 fastq2.extend([file])
     fastq1_mate=[]
     for fastq in fastq1:
         #check if present
-        put_R2=re.sub('_R1_', '_R2_', fastq)
+        put_R2=re.sub(r1_char, r2_char, fastq)
         try:
             fastq1_mate.extend([fastq2[fastq2.index(put_R2)]])
         except ValueError:
@@ -526,7 +528,7 @@ def make_runsheet(folder, sample_flag, genome_key, typeofseq, organized_by, strs
         output = os.path.join(os.getcwd())
     if(organized_by=="folder" and typeofseq=="pe"):
         ddir=[x[0] for x in os.walk(folder)]
-        dat=list(map(find_fastq_mate, ddir))
+        dat=list(map(find_fastq_mate, ddir, [r1_char] * len(ddir), [r2_char] * len(ddir)))
         good_dat = [i for i in dat if i.get('has_fastq') is True]
         good_dat = [i for i in good_dat if re.compile(r'.*'+sample_flag).search(i.get('directory_short'))]
         #good_dat = [i.update({"sample":i.get('directory_short')}) 

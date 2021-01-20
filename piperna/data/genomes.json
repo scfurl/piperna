@@ -38,5 +38,9 @@
     "mmul8_scri": {
         "fasta": "/active/furlan_s/refs/Mmul8v2/star",
         "gtf": "unk.gtf"
+    },
+    "GRCh38v36": {
+        "fasta": "/fh/scratch/delete90/furlan_s/mullighan/refs/star100",
+        "gtf": "/fh/fast/furlan_s/grp/refs/GRCh38/gencode.v36.annotation.gtf"
     }
 }
