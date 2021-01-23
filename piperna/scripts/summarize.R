@@ -49,7 +49,7 @@ if(df$software[1]=="STAR"){
 	gff0 <- import(gtffile)
 	idx <- mcols(gff0)$type == "exon"
 	genes<- split(gff0[idx], mcols(gff0[idx])[[opts$by]])
-	filenames <- file.path(paste0(df$output, "Aligned.sortedByCoord.out.bam"))
+	filenames <- file.path(paste0(df$output, "/Aligned.sortedByCoord.out.bam"))
 	df$filenames <- filenames
 	if(!all(file.exists(filenames))){stop("All Bam files not found")}
 	message("All Bam files in runsheet found")
