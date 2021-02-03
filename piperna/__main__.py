@@ -4,6 +4,10 @@ import logging
 import getpass
 import os
 from . import piperna
+"""
+sys.path.append('/home/sfurlan/.local/pipx/venvs/piperna/lib/python3.7/site-packages/piperna')
+import piperna
+"""
 
 POLL_TIME = 5
 LOG_PREFIX = '[piperna]: '
@@ -28,9 +32,10 @@ def run_piperna(args=None):
     parser.add_argument('--split_char', '-sc', type=str, default="_R1_", help='Character by which to split the fastqfile name into samples, OPTIONAL and for MAKERUNSHEET only')
     parser.add_argument('--R1_char', '-r1c', type=str, default="_R1_", help='Character by which to split the fastqfile name into read1, OPTIONAL and for MAKERUNSHEET only')
     parser.add_argument('--R2_char', '-r2c', type=str, default="_R2_", help='Character by which to split the fastqfile name into read2, OPTIONAL and for MAKERUNSHEET only')
+    parser.add_argument('--ext', '-e', type=str, default=".fastq.gz", help='suffix of fastq files, OPTIONAL and for MAKERUNSHEET only')
     parser.add_argument('--select', '-s', type=str, default=None, help='To only run the selected row in the runsheet, OPTIONAL and for MAKERUNSHEET only')
     parser.add_argument('--sample_flag', '-f', type=str, default="", help='FOR MAKERUNSHEET only string to identify samples of interest in a fastq folder')
-    parser.add_argument('--runsheet', '-r', type=str, help='tab-delim file with sample fields as defined in the script. - REQUIRED for all jobs except MAKERUNSHEET')
+    parser.add_argument('--runsheet', '-r', type=str, default = "runsheet.csv", help='tab-delim file with sample fields as defined in the script. - or name of runsheet to save if using MAKERUNSHEET')
     parser.add_argument('--typeofseq', '-t', type=str, default = "pe", choices=['single', 'pe'], help= 'Type of sequencing performed - REQUIRED for MAKERUNSHEET, UNBAM and CONCATFASTQ')
     parser.add_argument('--software', '-so', type=str, choices=['STAR', 'kallisto'], default="STAR", help='To set desired software, required and used for MAKERUNSHEET only')
     parser.add_argument('--output', '-o', type=str, default=".", help='To set output path, required for MAKERUNSHEET, UNBAM; OPTIONAL for SUMMARIZE-- default for SUMMARIZE is ./SummarizedExperiment.RDS')
@@ -53,7 +58,7 @@ def run_piperna(args=None):
     args = parser.parse_args()
     """
     call='piperna CONCATFASTQ -fc /archive/furlan_s/seq/cellranger/181015-NHPTreg/HHJJ7BGX5/outs/fastq_path,/archive/furlan_s/seq/cellranger/181015-NHPTreg/HWVFMBGX3/outs/fastq_path'
-    call='piperna MAKERUNSHEET -o . -gk shivani_bulk -fq "/active/furlan_s/Data/RORCAR_bulk/190917_SN367_1432_AH3KYLBCX3/Unaligned/Project_ssrivas2"'
+    call='piperna MAKERUNSHEET -o . -fq /fh/scratch/delete90/furlan_s/mullighan/fastqs'
     args = parser.parse_args(call.split(" ")[1:])
 
     #log
@@ -132,8 +137,8 @@ def run_piperna(args=None):
     if args.job=="MAKERUNSHEET":
         LOGGER.info("Parsing fastq folder - "+args.fastq_folder+" ...")
         piperna.make_runsheet(folder=args.fastq_folder, output=args.output, typeofseq=args.typeofseq, \
-            genome_key=args.genome_key, sample_flag = args.sample_flag, strsplit= args.split_char, r1_char=args.R1_char, \
-            r2_char=args.R2_char, software=args.software, organized_by=args.organized_by)
+            genome_key=args.genome_key, sample_flag = args.sample_flag, strsplit= args.split_char, ext=args.ext,  r1_char=args.R1_char, \
+            r2_char=args.R2_char, fname = args.runsheet, software=args.software, organized_by=args.organized_by)
         exit()
 
     if args.job=="CONCATFASTQ":

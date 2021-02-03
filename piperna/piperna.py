@@ -419,12 +419,12 @@ def find_bams(dir, sample_flag=None, full_name=True):
                 outbams.append(file)
     return(outbams)
 
-def find_fastq_mate(dir, r1_char, r2_char, sample_flag=None, full_name=True):
+def find_fastq_mate(dir, r1_char, r2_char, ext, sample_flag=None, full_name=True):
     fastqs=[]
     fastq1=[]
     fastq2=[]
     for file in os.listdir(dir):
-        if file.endswith(".fastq.gz"):
+        if file.endswith(ext):
             fastqs.extend([file])
             if r1_char in file:
                 fastq1.extend([file])
@@ -447,7 +447,7 @@ def find_fastq_mate(dir, r1_char, r2_char, sample_flag=None, full_name=True):
     values=[dir, os.path.basename(dir), "\t".join(fastq1), "\t".join(fastq1_mate), len(fastq1)>0]
     return(dict(zip(keys, values)))
 
-def find_fastqs_by_sample(dir, strsplit, r1_char, r2_char, typeofseq, full_name=True):
+def find_fastqs_by_sample(dir, strsplit, r1_char, r2_char, ext, typeofseq, full_name=True):
     fastqs=[]
     fastq1=fq1=[]
     fastq2=fq2=[]
@@ -455,7 +455,7 @@ def find_fastqs_by_sample(dir, strsplit, r1_char, r2_char, typeofseq, full_name=
     sample_dict=[]
     #sort into read1 and read2
     for file in os.listdir(dir):
-        if file.endswith(".fastq.gz"):
+        if file.endswith(ext):
             fastqs.extend([file])
             if r1_char in file:
                 fastq1.extend([file])
@@ -520,7 +520,7 @@ def unbam_prep(folder, output, typeofseq, organized_by):
     return dout
 
 
-def make_runsheet(folder, sample_flag, genome_key, typeofseq, organized_by, strsplit, r1_char, r2_char, output=None, fasta=None, software="STAR"):
+def make_runsheet(folder, sample_flag, genome_key, typeofseq, organized_by, strsplit, ext, r1_char, r2_char, fname, output=None, fasta=None, software="STAR"):
     #folder = '/active/furlan_s/Data/CNR/190801_CNRNotch/fastq/mini/fastq'
     #genome_key = "shivani_bulk"
     genome_data = load_genomes(GENOMES_JSON).get(genome_key)
@@ -528,16 +528,16 @@ def make_runsheet(folder, sample_flag, genome_key, typeofseq, organized_by, strs
         output = os.path.join(os.getcwd())
     if(organized_by=="folder" and typeofseq=="pe"):
         ddir=[x[0] for x in os.walk(folder)]
-        dat=list(map(find_fastq_mate, ddir, [r1_char] * len(ddir), [r2_char] * len(ddir)))
+        dat=list(map(find_fastq_mate, ddir, [r1_char] * len(ddir), [r2_char] * len(ddir), [ext] * len(ddir)))
         good_dat = [i for i in dat if i.get('has_fastq') is True]
         good_dat = [i for i in good_dat if re.compile(r'.*'+sample_flag).search(i.get('directory_short'))]
         #good_dat = [i.update({"sample":i.get('directory_short')}) 
         for i in good_dat:
             i.update({"sample":i.get('directory_short')})
     if(organized_by=="file" and typeofseq=="pe"):
-        good_dat=find_fastqs_by_sample(folder, strsplit=strsplit, r1_char=r1_char, r2_char=r2_char, typeofseq=typeofseq)
+        good_dat=find_fastqs_by_sample(folder, strsplit=strsplit, r1_char=r1_char, r2_char=r2_char, ext = ext, typeofseq=typeofseq)
     if(organized_by=="file" and typeofseq=="single"):
-        good_dat=find_fastqs_by_sample(folder, strsplit=strsplit, r1_char=r1_char, r2_char=r2_char, typeofseq=typeofseq)
+        good_dat=find_fastqs_by_sample(folder, strsplit=strsplit, r1_char=r1_char, r2_char=r2_char, ext = ext, typeofseq=typeofseq)
     for i in good_dat:
         i.update({'sample': i.get('sample'), \
             'output': os.path.join(output, i.get('sample')), \
@@ -545,7 +545,7 @@ def make_runsheet(folder, sample_flag, genome_key, typeofseq, organized_by, strs
             'index': genome_data.get('fasta'),
             'gtf': genome_data.get('gtf')})
     keys = good_dat[0].keys()
-    with open(os.path.join(output, 'runsheet.csv'), 'w') as output_file:
+    with open(fname, 'w') as output_file:
         dict_writer = csv.DictWriter(output_file, fieldnames = keys, extrasaction='ignore')
         dict_writer.writeheader()
         dict_writer.writerows(good_dat)
