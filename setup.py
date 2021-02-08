@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
     setuptools.setup(
     name="piperna",
-    version="1.65",
+    version="1.66",
     author="Scott Furlan",
     author_email="scottfurlan@gmail.com",
     description="A python wrapper for fast and parallel processing of bulk RNA Seq data",
