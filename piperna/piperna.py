@@ -102,7 +102,7 @@ class environs:
     def generate_job(self, commands, job):
         bash_scripts=[]
         torun = len(commands)
-        threads,ram = self.get_processor_line(threads = self.threads, ram = self.ram, job = job)
+        threads,ram = self.get_processor_line(threads = self.threads, ram = self.ram, job = job, gb_ram = self.ram)
         for i in range(torun):
             # bash_script = {  "PBS" : "#!/bin/bash\n#PBS -N %s\n#PBS -l %s\n#PBS -j oe\n#PBS -o $PBS_O_WORKDIR/logtmp\n#PBS -A %s\ncd $PBS_O_WORKDIR\n{%s} 2>&1 | tee %s\nsed -e 's/^/[HENIPIPE] JOB: %s:\t\t/' %s >> %s\nrm %s\n" % (job_name, self.processor_line, self.user, command, log_file, job_name, log_file, self.log_name, log_file),
                             # "SLURM" : "#!/bin/bash\n#SBATCH --job-name=%s\n#SBATCH --output=tmp\n#SBATCH --error=tmp\n#SBATCH --ntasks=1\n%s\n{%s} 2>&1 | tee %s\nsed -e 's/^/[HENIPIPE] JOB: %s:\t\t/' %s >> %s\nrm %s\n" % (job_name, self.processor_line, command, log_file, job_name, log_file, self.log_name, log_file)}
@@ -150,6 +150,7 @@ class Star(SampleFactory, object):
         self.job = "PIPERNA_STAR"
         self.out_sam_type = kwargs.get('out_sam_type')
         self.count = kwargs.get('count')
+        self.gb_ram = kwargs.get('gb_ram')
         self.global_add_STAR_string = kwargs.get('global_add_STAR_string')
         if self.global_add_STAR_string is None:
             self.global_add_STAR_string = ""
