@@ -15,6 +15,10 @@
         "fasta": "/fh/fast/furlan_s/grp/refs/GRCm38/star_indices_overhang100",
         "gtf": "/fh/fast/furlan_s/grp/refs/GRCm38/gencode_M24.gtf"
     },
+    "GRCm39": {
+        "fasta": "/fh/fast/furlan_s/grp/refs/GRCm39/star_indices_overhang100",
+        "gtf": "/fh/fast/furlan_s/grp/refs/GRCm39/gencode_M26.gtf"
+    },
     "GRCh38": {
         "fasta": "/fh/fast/furlan_s/grp/refs/GRCh38/star_indices_overhang100",
         "gtf": "/fh/fast/furlan_s/grp/refs/GRCh38/gencode_v33.gtf"

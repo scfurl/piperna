@@ -24,7 +24,7 @@ myFormatter._fmt = "[piperna]: " + myFormatter._fmt
 
 def run_piperna(args=None):
     parser = argparse.ArgumentParser('A wrapper for running RNASeq Alignment')
-    parser.add_argument('job', type=str, choices=['MAKERUNSHEET', 'ALIGN', 'SUMMARIZE', 'CONCATFASTQ', 'GENOMESFILE', 'UNBAM'], help='a required string denoting segment of pipeline to run.  1) "MAKERUNSHEET" - to parse a folder of fastqs; 2) "ALIGN" - to perform alignment using STAR or KALLISTO; 3) "SUMMARIZE" - to summarize and count reads, 4) "CONCATFASTQ" - function to concatenate fastq files -i.e. for SRA upload; 5) "GENOMESFILE" - print location of genomes.json file. 6) "UNBAM" - convert bam to fastq')
+    parser.add_argument('job', type=str, choices=['MAKERUNSHEET', 'ALIGN', 'SUMMARIZE', 'CONCATFASTQ', 'GENOMESFILE', 'ENVIRONSFILE','UNBAM'], help='a required string denoting segment of pipeline to run.  1) "MAKERUNSHEET" - to parse a folder of fastqs; 2) "ALIGN" - to perform alignment using STAR or KALLISTO; 3) "SUMMARIZE" - to summarize and count reads, 4) "CONCATFASTQ" - function to concatenate fastq files -i.e. for SRA upload; 5) "GENOMESFILE" - print location of and cat genomes.json file; 6) "ENVIRONSFILE" - print location of and cat environs.json file; 7) "UNBAM" - convert bam to fastq')
     parser.add_argument('--bam_folder', '-bf', type=str, help='For UNBAM only: Pathname of bam locations')
     parser.add_argument('--fastq_folder', '-fq', type=str, help='For MAKERUNSHEET only: Pathname of fastq folder')
     parser.add_argument('--organized_by', '-b', type=str, choices=['folder', 'file'], default='folder', help='Option to specify how fastq or unbam folder is organized')
@@ -94,7 +94,7 @@ def run_piperna(args=None):
         _ROOT = os.path.abspath(os.path.dirname(__file__))
         if args.install is None:
             GENOMES_JSON = os.path.join(_ROOT, 'data', 'genomes.json')
-            print("Showing contents og genomes.json file located at:\n"+GENOMES_JSON+"\n\n\n\n")
+            print("Showing contents of genomes.json file located at:\n"+GENOMES_JSON+"\n\n\n\n")
             f = open(GENOMES_JSON, 'r')
             file_contents = f.read()
             print (file_contents+"\n\n\n\n")
@@ -103,6 +103,21 @@ def run_piperna(args=None):
             from shutil import copyfile
             args.install = os.path.abspath(args.install)
             copyfile(args.install, os.path.join(_ROOT, 'data', 'genomes.json'))
+        exit()
+
+    if args.job=="ENVIRONSFILE":
+        _ROOT = os.path.abspath(os.path.dirname(__file__))
+        if args.install is None:
+            ENVIRONS_JSON = os.path.join(_ROOT, 'data', 'environs.json')
+            print("Showing contents of environs.json file located at:\n"+ENVIRONS_JSON+"\n\n\n\n")
+            f = open(ENVIRONS_JSON, 'r')
+            file_contents = f.read()
+            print (file_contents+"\n\n\n\n")
+            f.close()
+        if args.install is not None:
+            from shutil import copyfile
+            args.install = os.path.abspath(args.install)
+            copyfile(args.install, os.path.join(_ROOT, 'data', 'environs.json'))
         exit()
 
     #log
