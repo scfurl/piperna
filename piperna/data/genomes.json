@@ -19,6 +19,10 @@
         "fasta": "/fh/fast/furlan_s/grp/refs/GRCm39/star_indices_overhang100",
         "gtf": "/fh/fast/furlan_s/grp/refs/GRCm39/gencode_M26.gtf"
     },
+    "GRCm39_SS78": {
+        "fasta": "/fh/fast/furlan_s/grp/refs/GRCm39/TG/SS78/star_indices_overhang100",
+        "gtf": "/fh/fast/furlan_s/grp/refs/GRCm39/TG/SS78/gencode_M26.SS78.gtf"
+    },
     "GRCh38": {
         "fasta": "/fh/fast/furlan_s/grp/refs/GRCh38/star_indices_overhang100",
         "gtf": "/fh/fast/furlan_s/grp/refs/GRCh38/gencode_v33.gtf"
@@ -46,5 +50,10 @@
     "GRCh38v36": {
         "fasta": "/fh/scratch/delete90/furlan_s/mullighan/refs/star100",
         "gtf": "/fh/fast/furlan_s/grp/refs/GRCh38/gencode.v36.annotation.gtf"
+    },
+    "GRCh38_kallisto": {
+        "fasta": "/fh/fast/furlan_s/grp/refs/GRCh38/kallisto_index_GRCh38-July2021",
+        "gtf": "/fh/fast/furlan_s/grp/refs/GRCh38/gencode.v36.annotation.gtf"
     }
 }
+

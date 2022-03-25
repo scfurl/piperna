@@ -210,7 +210,7 @@ class kallisto(SampleFactory, object):
                 sample['single_info'] = """--single -l %s -s %s"""% (self.mfl, self.sfl)
             else:
                 sample['single_info'] = ""
-            commandline = """\nkallisto quant -i %s -o %s %s %s""" % (sample['index'], sample['output'], sample['single_info'], sample['fastqs'].replace("\t", " "))
+            commandline = """\nkallisto quant -t %s -i %s -o %s %s %s""" % (self.threads, sample['index'], sample['output'], sample['single_info'], fastq_line)
             #print(commandline.__class__.__name__)
             command.append([sample['sample'], commandline])
         return command
