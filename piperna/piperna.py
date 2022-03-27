@@ -175,7 +175,7 @@ class Star(SampleFactory, object):
                 fastq_line = sample['fastq1'].replace('\t', ',') + " " + sample['fastq2'].replace('\t', ',')
             if 'localSTARStr' in sample:
                 localSTARStr = sample['localSTARStr']
-            commandline = """\nSTAR --genomeDir %s --runThreadN %s --readFilesIn %s --outFileNamePrefix %s/ --readFilesCommand zcat --outSAMtype %s %s""" % (sample['index'], self.threads, fastq_line, sample['output'], self.out_sam_type, localSTARStr)
+            commandline = """mkdir %s\nSTAR --genomeDir %s --runThreadN %s --readFilesIn %s --outFileNamePrefix %s/ --readFilesCommand zcat --outSAMtype %s %s""" % (sample['output'], sample['index'], self.threads, fastq_line, sample['output'], self.out_sam_type, localSTARStr)
             if self.count:
                 commandline = commandline + """--quantMode GeneCounts"""
             commandline = commandline + self.global_add_STAR_string
